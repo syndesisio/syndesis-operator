@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: syndesis-operator
-          image: rhuss/syndesis-operator
+          image: syndesis/syndesis-operator
           command:
           - syndesis-operator
           imagePullPolicy: Always
