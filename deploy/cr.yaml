@@ -1,0 +1,4 @@
+apiVersion: "syndesis.io/v1alpha1"
+kind: "Syndesis"
+metadata:
+  name: "example"

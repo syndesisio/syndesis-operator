@@ -1,0 +1,10 @@
+/bin
+/.go
+/.push-*
+/.image-*
+/.dockerfile-*
+/vendor
+/.idea
+*.iml
+/.vendor
+/tmp
