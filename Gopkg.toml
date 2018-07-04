@@ -12,6 +12,23 @@
 
 [[constraint]]
   name = "github.com/operator-framework/operator-sdk"
-  # The version rule is used for a specific release and the master branch for in between releases.
-  branch = "master"
+  source = "git@github.com:nicolaferraro/operator-sdk.git"
+  # Using a fork until changes are merged back
+  branch = "syndesis-changes"
   # version = "=v0.0.5"
+
+[[override]]
+  name = "github.com/docker/distribution"
+  branch = "master"
+
+[[override]]
+  name = "github.com/openshift/origin"
+  version = "v3.9.0"
+
+[[override]]
+  name = "k8s.io/kubernetes"
+  version = "=v1.9.3"
+
+[[constraint]]
+  name = "github.com/go-bindata/go-bindata"
+  version = "1.0.0"

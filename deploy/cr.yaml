@@ -2,3 +2,5 @@ apiVersion: "syndesis.io/v1alpha1"
 kind: "Syndesis"
 metadata:
   name: "example"
+spec:
+  #routeHostname: syndesis.192.168.42.106.nip.io
