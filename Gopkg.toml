@@ -28,7 +28,3 @@
 [[override]]
   name = "k8s.io/kubernetes"
   version = "=v1.9.3"
-
-[[constraint]]
-  name = "github.com/go-bindata/go-bindata"
-  version = "1.0.0"
