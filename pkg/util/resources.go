@@ -1,9 +1,6 @@
 package util
 
 import (
-	// Load Openshift types
-	_ "github.com/syndesisio/syndesis-operator/pkg/openshift"
-
 	"github.com/syndesisio/syndesis-operator/resources"
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -16,17 +13,21 @@ import (
 )
 
 func LoadKubernetesResourceFromAsset(path string) (runtime.Object, error) {
-	data, err := resources.Asset(path)
-	if err != nil {
-		return nil, err
-	}
-
-	data, err = jsonIfYaml(data, path)
+	data, err := LoadJSONDataFromAsset(path)
 	if err != nil {
 		return nil, err
 	}
 
 	return LoadKubernetesResource(data)
+}
+
+func LoadJSONDataFromAsset(path string) ([]byte, error) {
+	data, err := resources.Asset(path)
+	if err != nil {
+		return nil, err
+	}
+
+	return jsonIfYaml(data, path)
 }
 
 func LoadKubernetesResourceFromFile(path string) (runtime.Object, error) {

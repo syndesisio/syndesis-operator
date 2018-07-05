@@ -4,11 +4,11 @@ import (
 	api "github.com/syndesisio/syndesis-operator/pkg/apis/syndesis/v1alpha1"
 	"github.com/syndesisio/syndesis-operator/pkg/util"
 	"github.com/openshift/api/template/v1"
-	"github.com/syndesisio/syndesis-operator/pkg/openshift"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	corev1 "k8s.io/kubernetes/staging/src/k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"github.com/syndesisio/syndesis-operator/pkg/openshift/template"
 )
 
 // Reconcile the state of the Syndesis infrastructure elements
@@ -62,7 +62,10 @@ func Create(syndesis *api.Syndesis) error {
 	}
 
 	templ := res.(*v1.Template)
-	processor := openshift.NewTemplateProcessor(syndesis.Namespace)
+	processor, err := template.NewTemplateProcessor(syndesis.Namespace)
+	if err != nil {
+		return err
+	}
 
 	params := make(map[string]string)
 	params["ROUTE_HOSTNAME"] = syndesis.Spec.RouteHostName

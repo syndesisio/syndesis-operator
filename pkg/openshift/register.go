@@ -4,12 +4,12 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"github.com/sirupsen/logrus"
 	"github.com/operator-framework/operator-sdk/pkg/util/k8sutil"
-	apps "github.com/openshift/origin/pkg/apps/apis/apps/v1"
-	template "github.com/openshift/origin/pkg/template/apis/template/v1"
-	image "github.com/openshift/origin/pkg/image/apis/image/v1"
-	route "github.com/openshift/origin/pkg/route/apis/route/v1"
-	build "github.com/openshift/origin/pkg/build/apis/build/v1"
-	authorization "github.com/openshift/origin/pkg/authorization/apis/authorization/v1"
+	apps "github.com/openshift/api/apps/v1"
+	template "github.com/openshift/api/template/v1"
+	image "github.com/openshift/api/image/v1"
+	route "github.com/openshift/api/route/v1"
+	build "github.com/openshift/api/build/v1"
+	authorization "github.com/openshift/api/authorization/v1"
 )
 
 /**

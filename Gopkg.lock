@@ -14,25 +14,10 @@
   revision = "de5bf2ad457846296e2031421a34e2568e304e35"
 
 [[projects]]
-  name = "github.com/blang/semver"
-  packages = ["."]
-  revision = "2ee87856327ba09384cabd113bc6b5d174e9ec0f"
-  version = "v3.5.1"
-
-[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
   version = "v1.1.0"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/docker/distribution"
-  packages = [
-    "digestset",
-    "reference"
-  ]
-  revision = "749f6afb4572201e3c37325d0ffedb6f32be8950"
 
 [[projects]]
   name = "github.com/emicklei/go-restful"
@@ -65,13 +50,13 @@
   branch = "master"
   name = "github.com/go-openapi/spec"
   packages = ["."]
-  revision = "bcff419492eeeb01f76e77d2ebc714dc97b607f5"
+  revision = "16284f9da51d5a5b5dc67c8109a99b014c4b7f0a"
 
 [[projects]]
   branch = "master"
   name = "github.com/go-openapi/swag"
   packages = ["."]
-  revision = "811b1089cde9dad18d4d0c2d09fbdbf28dbd27a5"
+  revision = "2b0bd4f193d011c203529df626a65d63cb8a79e8"
 
 [[projects]]
   name = "github.com/gogo/protobuf"
@@ -187,12 +172,6 @@
   version = "1.0.1"
 
 [[projects]]
-  name = "github.com/opencontainers/go-digest"
-  packages = ["."]
-  revision = "279bed98673dd5bef374d3b6e4b09e2af76183bf"
-  version = "v1.0.0-rc1"
-
-[[projects]]
   name = "github.com/openshift/api"
   packages = [
     "apps/v1",
@@ -201,59 +180,11 @@
     "image/docker10",
     "image/dockerpre012",
     "image/v1",
-    "network/v1",
-    "oauth/v1",
     "pkg/serialization",
-    "project/v1",
-    "quota/v1",
     "route/v1",
-    "security/v1",
-    "template/v1",
-    "user/v1"
+    "template/v1"
   ]
   revision = "0d921e363e951d89f583292c60d013c318df64dc"
-  version = "v3.9.0"
-
-[[projects]]
-  name = "github.com/openshift/origin"
-  packages = [
-    "pkg/api/apihelpers",
-    "pkg/api/legacy",
-    "pkg/apps/apis/apps",
-    "pkg/apps/apis/apps/v1",
-    "pkg/authorization/apis/authorization",
-    "pkg/authorization/apis/authorization/internal/serviceaccount",
-    "pkg/authorization/apis/authorization/v1",
-    "pkg/build/apis/build",
-    "pkg/build/apis/build/v1",
-    "pkg/image/apis/image",
-    "pkg/image/apis/image/internal/digest",
-    "pkg/image/apis/image/internal/reference",
-    "pkg/image/apis/image/v1",
-    "pkg/network/apis/network",
-    "pkg/network/apis/network/v1",
-    "pkg/oauth/apis/oauth",
-    "pkg/oauth/apis/oauth/v1",
-    "pkg/project/apis/project",
-    "pkg/project/apis/project/v1",
-    "pkg/quota/apis/quota",
-    "pkg/quota/apis/quota/v1",
-    "pkg/route/apis/route",
-    "pkg/route/apis/route/v1",
-    "pkg/security/apis/security",
-    "pkg/security/apis/security/v1",
-    "pkg/security/securitycontextconstraints/util",
-    "pkg/template/apis/template",
-    "pkg/template/apis/template/install",
-    "pkg/template/apis/template/v1",
-    "pkg/template/client/internalversion",
-    "pkg/template/generated/internalclientset",
-    "pkg/template/generated/internalclientset/scheme",
-    "pkg/template/generated/internalclientset/typed/template/internalversion",
-    "pkg/user/apis/user",
-    "pkg/user/apis/user/v1"
-  ]
-  revision = "191fece9305a76f262baacc9de72c2c8cb4d5601"
   version = "v3.9.0"
 
 [[projects]]
@@ -265,7 +196,7 @@
     "pkg/util/k8sutil",
     "version"
   ]
-  revision = "d5aa4ecef92212d6cf44546b77813dcd0b8fb4ef"
+  revision = "ca2e3e4791c507e7c8bc65909fa409945ed63417"
   source = "git@github.com:nicolaferraro/operator-sdk.git"
 
 [[projects]]
@@ -329,7 +260,7 @@
     "unix",
     "windows"
   ]
-  revision = "7138fd3d9dc8335c567ca206f4333fb75eb05d56"
+  revision = "151529c776cdc58ddbe7963ba9af779f3577b419"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -401,27 +332,14 @@
   version = "kubernetes-1.9.3"
 
 [[projects]]
-  branch = "master"
-  name = "k8s.io/apiextensions-apiserver"
-  packages = ["pkg/features"]
-  revision = "ef56e88b1b0926f95aba3e2016772f574443c506"
-
-[[projects]]
   name = "k8s.io/apimachinery"
   packages = [
-    "pkg/api/equality",
     "pkg/api/errors",
     "pkg/api/meta",
     "pkg/api/resource",
-    "pkg/api/validation",
-    "pkg/api/validation/path",
-    "pkg/apimachinery",
-    "pkg/apimachinery/announced",
-    "pkg/apimachinery/registered",
     "pkg/apis/meta/internalversion",
     "pkg/apis/meta/v1",
     "pkg/apis/meta/v1/unstructured",
-    "pkg/apis/meta/v1/validation",
     "pkg/apis/meta/v1alpha1",
     "pkg/conversion",
     "pkg/conversion/queryparams",
@@ -457,15 +375,6 @@
   ]
   revision = "19e3f5aa3adca672c153d324e6b7d82ff8935f03"
   version = "kubernetes-1.9.3"
-
-[[projects]]
-  branch = "master"
-  name = "k8s.io/apiserver"
-  packages = [
-    "pkg/features",
-    "pkg/util/feature"
-  ]
-  revision = "c3c11a8c497559e736829f3034f1d583fccd8679"
 
 [[projects]]
   name = "k8s.io/client-go"
@@ -532,26 +441,9 @@
   packages = ["pkg/common"]
   revision = "d83b052f768a50a309c692a9c271da3f3276ff88"
 
-[[projects]]
-  name = "k8s.io/kubernetes"
-  packages = [
-    "pkg/api/legacyscheme",
-    "pkg/apis/autoscaling",
-    "pkg/apis/core",
-    "pkg/apis/core/v1",
-    "pkg/apis/extensions",
-    "pkg/apis/networking",
-    "pkg/apis/rbac",
-    "pkg/features",
-    "pkg/util/parsers",
-    "pkg/util/pointer"
-  ]
-  revision = "d2835416544f298c919e2ead3be3d0864b52323b"
-  version = "v1.9.3"
-
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "60f50758e537671c8a82c9f7e771234f05ce051b2bad0bcd853091d819fb1898"
+  inputs-digest = "aa73a4cfb6e596193987fe159fa137d70054689f7dda371f50e7c1e234a79e38"
   solver-name = "gps-cdcl"
   solver-version = 1

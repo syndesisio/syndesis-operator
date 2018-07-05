@@ -4,6 +4,9 @@ import (
 	"context"
 	"runtime"
 
+	// Load Openshift types
+	_ "github.com/syndesisio/syndesis-operator/pkg/openshift"
+
 	"github.com/syndesisio/syndesis-operator/pkg/stub"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/operator-framework/operator-sdk/pkg/util/k8sutil"

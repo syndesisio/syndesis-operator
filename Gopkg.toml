@@ -1,7 +1,4 @@
 
-ignored = ["k8s.io/kubernetes/staging/src/*"]
-
-
 [[override]]
   name = "k8s.io/api"
   version = "kubernetes-1.9.3"
@@ -20,16 +17,4 @@ ignored = ["k8s.io/kubernetes/staging/src/*"]
   # Using a fork until changes are merged back
   branch = "syndesis-changes"
   # version = "=v0.0.5"
-
-[[override]]
-  name = "github.com/docker/distribution"
-  branch = "master"
-
-[[override]]
-  name = "github.com/openshift/origin"
-  version = "v3.9.0"
-
-[[override]]
-  name = "k8s.io/kubernetes"
-  version = "=v1.9.3"
 
