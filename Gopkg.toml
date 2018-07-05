@@ -1,3 +1,7 @@
+
+ignored = ["k8s.io/kubernetes/staging/src/*"]
+
+
 [[override]]
   name = "k8s.io/api"
   version = "kubernetes-1.9.3"
@@ -28,3 +32,4 @@
 [[override]]
   name = "k8s.io/kubernetes"
   version = "=v1.9.3"
+

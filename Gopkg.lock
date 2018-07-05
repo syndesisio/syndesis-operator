@@ -50,12 +50,6 @@
   version = "v1.0.0"
 
 [[projects]]
-  name = "github.com/go-bindata/go-bindata"
-  packages = ["."]
-  revision = "5ebd2c033d84e12a7f4aae4483d98ec7dde53b66"
-  version = "v1.0.0"
-
-[[projects]]
   branch = "master"
   name = "github.com/go-openapi/jsonpointer"
   packages = ["."]
@@ -558,6 +552,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "38b9d0ba352f40207091ee518453aebdb06ff9f0ff7c30fb0073b763836c29d9"
+  inputs-digest = "60f50758e537671c8a82c9f7e771234f05ce051b2bad0bcd853091d819fb1898"
   solver-name = "gps-cdcl"
   solver-version = 1
