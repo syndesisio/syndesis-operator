@@ -1,15 +1,15 @@
 package template
 
 import (
+	"errors"
+	v1template "github.com/openshift/api/template/v1"
 	"github.com/operator-framework/operator-sdk/pkg/k8sclient"
 	"github.com/sirupsen/logrus"
-	"k8s.io/client-go/rest"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-	v1template "github.com/openshift/api/template/v1"
 	"github.com/syndesisio/syndesis-operator/pkg/util"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/json"
-	"errors"
+	"k8s.io/client-go/rest"
 )
 
 type TemplateProcessor struct {

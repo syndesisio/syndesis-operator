@@ -13,6 +13,15 @@ type SyndesisList struct {
 	Items []Syndesis `json:"items"`
 }
 
+func NewSyndesisList() *SyndesisList {
+	return &SyndesisList{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: groupName + "/" + version,
+			Kind: "Syndesis",
+		},
+	}
+}
+
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 type Syndesis struct {
@@ -29,8 +38,28 @@ type SyndesisSpec struct {
 	Components       *Components `json:"components, omitempty"`
 }
 
+type SyndesisInstallationStatus string
+
+const (
+	SyndesisInstallationStatusMissing			SyndesisInstallationStatus = ""
+	SyndesisInstallationStatusInstalling		SyndesisInstallationStatus = "Installing"
+	SyndesisInstallationStatusStarting			SyndesisInstallationStatus = "Starting"
+	SyndesisInstallationStatusInstalled			SyndesisInstallationStatus = "Installed"
+	SyndesisInstallationStatusNotInstalled		SyndesisInstallationStatus = "NotInstalled"
+)
+
+type SyndesisStatusReason string
+
+const (
+	SyndesisStatusReasonMissing	= ""
+	SyndesisStatusReasonDuplicate	= "Duplicate"
+)
+
 type SyndesisStatus struct {
+	InstallationStatus	SyndesisInstallationStatus	`json:"installationStatus, omitempty"`
+	Reason				SyndesisStatusReason		`json:"reason, omitempty"`
 }
+
 
 type Components struct {
 	Db         DbResources `json:"db, omitempty"`
