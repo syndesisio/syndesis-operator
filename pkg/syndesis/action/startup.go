@@ -48,6 +48,7 @@ func (a *Startup) Execute(syndesis *v1alpha1.Syndesis) error {
 		target := syndesis.DeepCopy()
 		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusInstalled
 		target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
+		logrus.Info("Syndesis resource ", syndesis.Name, " started up")
 		return sdk.Update(target)
 	} else {
 		logrus.Info("Waiting for Syndesis resource ", syndesis.Name, " to startup")

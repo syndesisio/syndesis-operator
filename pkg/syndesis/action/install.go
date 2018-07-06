@@ -1,12 +1,15 @@
 package action
 
 import (
+	"errors"
 	"github.com/openshift/api/template/v1"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
 	"github.com/syndesisio/syndesis-operator/pkg/apis/syndesis/v1alpha1"
+	"github.com/syndesisio/syndesis-operator/pkg/openshift/serviceaccount"
 	"github.com/syndesisio/syndesis-operator/pkg/openshift/template"
 	"github.com/syndesisio/syndesis-operator/pkg/util"
+	coreV1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
@@ -28,9 +31,21 @@ func (a *Install) Execute(syndesis *v1alpha1.Syndesis) error {
 		return err
 	}
 
+	var saName string
+	if sa, ok := serviceAccountRes.(*coreV1.ServiceAccount); ok {
+		saName = sa.Name
+	} else {
+		return errors.New("Cannot determine service account name")
+	}
+
 	customizeKubernetesResource(serviceAccountRes, syndesis)
 	err = sdk.Create(serviceAccountRes)
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
+		return err
+	}
+
+	token, err := serviceaccount.GetServiceAccountToken(saName, syndesis.Namespace)
+	if err != nil {
 		return err
 	}
 
@@ -48,6 +63,7 @@ func (a *Install) Execute(syndesis *v1alpha1.Syndesis) error {
 	params := make(map[string]string)
 	params["ROUTE_HOSTNAME"] = syndesis.Spec.RouteHostName
 	params["OPENSHIFT_PROJECT"] = syndesis.Namespace
+	params["OPENSHIFT_OAUTH_CLIENT_SECRET"] = token
 
 	list, err := processor.Process(templ, params)
 	if err != nil {
@@ -72,6 +88,8 @@ func (a *Install) Execute(syndesis *v1alpha1.Syndesis) error {
 	target := syndesis.DeepCopy()
 	target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusStarting
 	target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
+
+	logrus.Info("Syndesis resource ", syndesis.Name, " installed")
 
 	return sdk.Update(target)
 }
