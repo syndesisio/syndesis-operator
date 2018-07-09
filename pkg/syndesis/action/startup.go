@@ -21,7 +21,7 @@ func (a *Startup) CanExecute(syndesis *v1alpha1.Syndesis) bool {
 func (a *Startup) Execute(syndesis *v1alpha1.Syndesis) error {
 
 	options := sdk.WithListOptions(&metav1.ListOptions{
-		LabelSelector: "syndesis.io/app=syndesis",
+		LabelSelector: "syndesis.io/app=syndesis,syndesis.io/type=infrastructure",
 	})
 	list := metav1.List{
 		TypeMeta: metav1.TypeMeta{
