@@ -47,6 +47,7 @@ const (
 	SyndesisInstallationStatusMissing			SyndesisInstallationStatus = ""
 	SyndesisInstallationStatusInstalling		SyndesisInstallationStatus = "Installing"
 	SyndesisInstallationStatusStarting			SyndesisInstallationStatus = "Starting"
+	SyndesisInstallationStatusStartupFailed		SyndesisInstallationStatus = "StartupFailed"
 	SyndesisInstallationStatusInstalled			SyndesisInstallationStatus = "Installed"
 	SyndesisInstallationStatusNotInstalled		SyndesisInstallationStatus = "NotInstalled"
 )
@@ -54,8 +55,9 @@ const (
 type SyndesisStatusReason string
 
 const (
-	SyndesisStatusReasonMissing	= ""
-	SyndesisStatusReasonDuplicate	= "Duplicate"
+	SyndesisStatusReasonMissing				= ""
+	SyndesisStatusReasonDuplicate			= "Duplicate"
+	SyndesisStatusReasonDeploymentNotReady	= "DeploymentNotReady"
 )
 
 type SyndesisStatus struct {

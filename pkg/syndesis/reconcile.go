@@ -2,6 +2,7 @@ package syndesis
 
 import (
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
+	"github.com/sirupsen/logrus"
 	api "github.com/syndesisio/syndesis-operator/pkg/apis/syndesis/v1alpha1"
 	"github.com/syndesisio/syndesis-operator/pkg/syndesis/action"
 )
@@ -23,6 +24,7 @@ func Reconcile(syndesis *api.Syndesis, deleted bool) error {
 
 	if deleted {
 		// No specific actions to do on deletion
+		logrus.Info("Syndesis resource ", syndesis.Name, " deleted")
 		return nil
 	}
 

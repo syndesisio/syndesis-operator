@@ -6,6 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/syndesisio/syndesis-operator/pkg/apis/syndesis/v1alpha1"
 	"github.com/syndesisio/syndesis-operator/pkg/util"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -15,7 +16,9 @@ type Startup struct {}
 
 
 func (a *Startup) CanExecute(syndesis *v1alpha1.Syndesis) bool {
-	return syndesisInstallationStatusIs(syndesis, v1alpha1.SyndesisInstallationStatusStarting)
+	return syndesisInstallationStatusIs(syndesis,
+		v1alpha1.SyndesisInstallationStatusStarting,
+		v1alpha1.SyndesisInstallationStatusStartupFailed)
 }
 
 func (a *Startup) Execute(syndesis *v1alpha1.Syndesis) error {
@@ -34,12 +37,16 @@ func (a *Startup) Execute(syndesis *v1alpha1.Syndesis) error {
 	}
 
 	ready := true
+	var failedDeployment *string
 	for _, o := range list.Items {
 		if deplObj, err := util.LoadKubernetesResource(o.Raw); err != nil {
 			return err
 		} else if depl, ok := deplObj.(*v1.DeploymentConfig); ok {
 			if depl.Spec.Replicas != depl.Status.ReadyReplicas {
 				ready = false
+			}
+			if depl.Spec.Replicas != depl.Status.Replicas && depl.Status.Replicas == 0 && !isProcessing(depl) {
+				failedDeployment = &depl.Name
 			}
 		}
 	}
@@ -48,11 +55,31 @@ func (a *Startup) Execute(syndesis *v1alpha1.Syndesis) error {
 		target := syndesis.DeepCopy()
 		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusInstalled
 		target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
-		logrus.Info("Syndesis resource ", syndesis.Name, " started up")
+		logrus.Info("Syndesis resource ", syndesis.Name, " installed successfully")
+		return sdk.Update(target)
+	} else if failedDeployment != nil {
+		target := syndesis.DeepCopy()
+		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusStartupFailed
+		target.Status.Reason = v1alpha1.SyndesisStatusReasonDeploymentNotReady
+		logrus.Info("Startup failed for Syndesis resource ", syndesis.Name, ". Deployment ", *failedDeployment, " not ready")
 		return sdk.Update(target)
 	} else {
+		target := syndesis.DeepCopy()
+		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusStarting
+		target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
 		logrus.Info("Waiting for Syndesis resource ", syndesis.Name, " to startup")
-		return nil
+		return sdk.Update(target)
 	}
+}
+
+func isProcessing(dc *v1.DeploymentConfig) bool {
+	for _, condition := range dc.Status.Conditions {
+		if condition.Type == v1.DeploymentProgressing {
+			if condition.Status == corev1.ConditionFalse {
+				return false
+			}
+		}
+	}
+	return true
 }
 
