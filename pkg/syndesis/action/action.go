@@ -28,7 +28,7 @@ func syndesisInstallationStatusIs(syndesis *v1alpha1.Syndesis, statuses ...v1alp
 	return false
 }
 
-func customizeKubernetesResource(resource interface{}, syndesis *v1alpha1.Syndesis) {
+func setNamespaceAndOwnerReference(resource interface{}, syndesis *v1alpha1.Syndesis) {
 	if kObj, ok := resource.(metav1.Object); ok {
 		kObj.SetNamespace(syndesis.Namespace)
 

@@ -75,7 +75,7 @@ func (p *TemplateProcessor) Process(sourceTemplate *v1template.Template, paramet
 			return v1Temp.Objects, nil
 		}
 		logrus.Error("Wrong type returned by the server", templ)
-		return nil, errors.New("Wrong type returned by the server")
+		return nil, errors.New("wrong type returned by the server")
 	}
 
 	return nil, result.Error()

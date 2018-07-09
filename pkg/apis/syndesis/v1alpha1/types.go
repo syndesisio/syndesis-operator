@@ -33,7 +33,7 @@ type Syndesis struct {
 
 type SyndesisSpec struct {
 	RouteHostName    		string      `json:"routeHostname,omitempty"`
-	DemoData         		*bool        `json:"demoData,omitempty"`
+	DemoData         		*bool       `json:"demoData,omitempty"`
 	DeployIntegrations		*bool		`json:"deployIntegrations,omitempty"`
 	ImageStreamNamespace	string		`json:"imageStreamNamespace,omitempty"`
 	IntegrationLimit 		*int        `json:"integrationLimit,omitempty"`

@@ -48,7 +48,7 @@ func GetServiceAccountToken(serviceAccountName string, namespace string) (string
 		}
 	}
 
-	return "", errors.New("Service account token not found")
+	return "", errors.New("service account token not found")
 }
 
 func isValidServiceAccountToken(serviceAccount *corev1.ServiceAccount, secret *corev1.Secret) bool {

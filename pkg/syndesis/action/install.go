@@ -1,7 +1,6 @@
 package action
 
 import (
-	"errors"
 	"github.com/openshift/api/template/v1"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
@@ -10,11 +9,17 @@ import (
 	"github.com/syndesisio/syndesis-operator/pkg/openshift/template"
 	"github.com/syndesisio/syndesis-operator/pkg/syndesis/configuration"
 	"github.com/syndesisio/syndesis-operator/pkg/util"
-	coreV1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 // Install syndesis into the namespace, taking resources from the template
+
+const (
+	replaceResourcesIfPresent = true
+)
 
 type Install struct {}
 
@@ -27,25 +32,15 @@ func (a *Install) Execute(syndesis *v1alpha1.Syndesis) error {
 
 	logrus.Info("Installing Syndesis resource ", syndesis.Name)
 
-	serviceAccountRes, err := util.LoadKubernetesResourceFromAsset("oauth-client-sa.yaml")
-	if err != nil {
-		return err
-	}
-
-	var saName string
-	if sa, ok := serviceAccountRes.(*coreV1.ServiceAccount); ok {
-		saName = sa.Name
-	} else {
-		return errors.New("Cannot determine service account name")
-	}
-
-	customizeKubernetesResource(serviceAccountRes, syndesis)
-	err = sdk.Create(serviceAccountRes)
+	sa := newSyndesisServiceAccount()
+	setNamespaceAndOwnerReference(sa, syndesis)
+	// We don't replace the service account if already present, to let Kubernetes generate its tokens
+	err := sdk.Create(sa)
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
 		return err
 	}
 
-	token, err := serviceaccount.GetServiceAccountToken(saName, syndesis.Namespace)
+	token, err := serviceaccount.GetServiceAccountToken(sa.Name, syndesis.Namespace)
 	if err != nil {
 		return err
 	}
@@ -75,9 +70,9 @@ func (a *Install) Execute(syndesis *v1alpha1.Syndesis) error {
 			return err
 		}
 
-		customizeKubernetesResource(res, syndesis)
+		setNamespaceAndOwnerReference(res, syndesis)
 
-		err = sdk.Create(res)
+		err = createOrReplace(res)
 		if err != nil && !k8serrors.IsAlreadyExists(err) {
 			return err
 		}
@@ -93,3 +88,51 @@ func (a *Install) Execute(syndesis *v1alpha1.Syndesis) error {
 	return sdk.Update(target)
 }
 
+func createOrReplace(res runtime.Object) error {
+	if err := sdk.Create(res); err != nil && k8serrors.IsAlreadyExists(err) {
+		if canResourceBeReplaced(res) {
+			err = sdk.Delete(res, sdk.WithDeleteOptions(&metav1.DeleteOptions{}))
+			if err != nil {
+				return err
+			}
+			return sdk.Create(res)
+		} else {
+			return nil
+		}
+	} else {
+		return err
+	}
+}
+
+func canResourceBeReplaced(res runtime.Object) bool {
+	if !replaceResourcesIfPresent {
+		return false
+	}
+
+	if _, blacklisted := res.(*corev1.PersistentVolumeClaim); blacklisted {
+		return false
+	}
+	return true
+}
+
+func newSyndesisServiceAccount() *corev1.ServiceAccount {
+	sa := corev1.ServiceAccount{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "v1",
+			Kind: "ServiceAccount",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "syndesis-oauth-client",
+			Labels: map[string]string{
+				"app": "syndesis",
+			},
+			Annotations: map[string]string {
+				"serviceaccounts.openshift.io/oauth-redirecturi.local": "https://localhost:4200",
+				"serviceaccounts.openshift.io/oauth-redirecturi.route": "https://",
+				"serviceaccounts.openshift.io/oauth-redirectreference.route": `{"kind": "OAuthRedirectReference", "apiVersion": "v1", "reference": {"kind": "Route","name": "syndesis"}}`,
+			},
+		},
+	}
+
+	return &sa
+}
