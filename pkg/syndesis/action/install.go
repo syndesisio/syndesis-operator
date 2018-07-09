@@ -8,6 +8,7 @@ import (
 	"github.com/syndesisio/syndesis-operator/pkg/apis/syndesis/v1alpha1"
 	"github.com/syndesisio/syndesis-operator/pkg/openshift/serviceaccount"
 	"github.com/syndesisio/syndesis-operator/pkg/openshift/template"
+	"github.com/syndesisio/syndesis-operator/pkg/syndesis/configuration"
 	"github.com/syndesisio/syndesis-operator/pkg/util"
 	coreV1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -60,10 +61,8 @@ func (a *Install) Execute(syndesis *v1alpha1.Syndesis) error {
 		return err
 	}
 
-	params := make(map[string]string)
-	params["ROUTE_HOSTNAME"] = syndesis.Spec.RouteHostName
-	params["OPENSHIFT_PROJECT"] = syndesis.Namespace
-	params["OPENSHIFT_OAUTH_CLIENT_SECRET"] = token
+	params := configuration.GetEnvVars(syndesis)
+	params[string(configuration.EnvOpenshiftOauthClientSecret)] = token
 
 	list, err := processor.Process(templ, params)
 	if err != nil {
