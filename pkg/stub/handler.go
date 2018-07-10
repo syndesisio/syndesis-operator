@@ -19,7 +19,7 @@ type Handler struct {
 func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 	switch o := event.Object.(type) {
 	case *api.Syndesis:
-		return syndesis.Reconcile(o)
+		return syndesis.Reconcile(o, event.Deleted)
 	}
 	return nil
 }

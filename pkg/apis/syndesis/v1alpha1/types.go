@@ -13,6 +13,15 @@ type SyndesisList struct {
 	Items []Syndesis `json:"items"`
 }
 
+func NewSyndesisList() *SyndesisList {
+	return &SyndesisList{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: groupName + "/" + version,
+			Kind: "Syndesis",
+		},
+	}
+}
+
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 type Syndesis struct {
@@ -23,27 +32,71 @@ type Syndesis struct {
 }
 
 type SyndesisSpec struct {
-	RouteHostName    string      `json:"routeHostname, omitempty"`
-	DemoData         bool        `json:"demoData, omitempty"`
-	IntegrationLimit int         `json:"integrationLimit, omitempty"`
-	Components       *Components `json:"components, omitempty"`
+	RouteHostName    		string      `json:"routeHostname,omitempty"`
+	DemoData         		*bool       `json:"demoData,omitempty"`
+	DeployIntegrations		*bool		`json:"deployIntegrations,omitempty"`
+	ImageStreamNamespace	string		`json:"imageStreamNamespace,omitempty"`
+	IntegrationLimit 		*int        `json:"integrationLimit,omitempty"`
+	Registry 				string		`json:"registry,omitempty"`
+	Components       		Components  `json:"components,omitempty"`
 }
+
+type SyndesisInstallationStatus string
+
+const (
+	SyndesisInstallationStatusMissing			SyndesisInstallationStatus = ""
+	SyndesisInstallationStatusInstalling		SyndesisInstallationStatus = "Installing"
+	SyndesisInstallationStatusStarting			SyndesisInstallationStatus = "Starting"
+	SyndesisInstallationStatusStartupFailed		SyndesisInstallationStatus = "StartupFailed"
+	SyndesisInstallationStatusInstalled			SyndesisInstallationStatus = "Installed"
+	SyndesisInstallationStatusNotInstalled		SyndesisInstallationStatus = "NotInstalled"
+)
+
+type SyndesisStatusReason string
+
+const (
+	SyndesisStatusReasonMissing				= ""
+	SyndesisStatusReasonDuplicate			= "Duplicate"
+	SyndesisStatusReasonDeploymentNotReady	= "DeploymentNotReady"
+)
 
 type SyndesisStatus struct {
+	InstallationStatus	SyndesisInstallationStatus	`json:"installationStatus,omitempty"`
+	Reason				SyndesisStatusReason		`json:"reason,omitempty"`
 }
+
 
 type Components struct {
-	Db         DbResources `json:"db, omitempty"`
-	Prometheus Resources   `json:"prometheus, omitempty"`
-	Server     Resources   `json:"server, omitempty"`
-	Meta       Resources   `json:"meta, omitempty"`
+	Db         DbConfiguration			`json:"db,omitempty"`
+	Prometheus PrometheusConfiguration	`json:"prometheus,omitempty"`
+	Server     ServerConfiguration		`json:"server,omitempty"`
+	Meta       MetaConfiguration		`json:"meta,omitempty"`
 }
 
-type DbResources struct {
-	Resources v1.ResourceRequirements `json:"resources, omitempty"`
-	User      string                  `json:"user, omitempty"`
+type DbConfiguration struct {
+	Resources 					ResourcesWithVolume		`json:"resources,omitempty"`
+	User      					string                  `json:"user,omitempty"`
+	Database    				string                  `json:"database,omitempty"`
+	ImageStreamNamespace		string                  `json:"imageStreamNamespace,omitempty"`
+}
+
+type PrometheusConfiguration struct {
+	Resources 					ResourcesWithVolume		`json:"resources,omitempty"`
+}
+
+type ServerConfiguration struct {
+	Resources 					Resources				`json:"resources,omitempty"`
+}
+
+type MetaConfiguration struct {
+	Resources 					ResourcesWithVolume		`json:"resources,omitempty"`
 }
 
 type Resources struct {
-	Resources v1.ResourceRequirements `json:"resources, omitempty"`
+	v1.ResourceRequirements `json:",inline"`
+}
+
+type ResourcesWithVolume struct {
+	v1.ResourceRequirements 				`json:",inline"`
+	VolumeCapacity				string      `json:"volumeCapacity,omitempty"`
 }
