@@ -85,7 +85,7 @@ rules:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  name: syndesis-operator-role-binding
+  name: syndesis-operator:install
   labels:
     app: syndesis
     syndesis.io/app: syndesis
