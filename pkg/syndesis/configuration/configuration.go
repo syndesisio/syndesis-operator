@@ -35,6 +35,8 @@ const (
 	EnvSyndesisRegistry					SyndesisEnvVar = "SYNDESIS_REGISTRY"
 	EnvDemoDataEnabled					SyndesisEnvVar = "DEMO_DATA_ENABLED"
 	EnvMaxIntegrationsPerUser			SyndesisEnvVar = "MAX_INTEGRATIONS_PER_USER"
+
+	EnvSyndesisVersion 					SyndesisEnvVar = "SYNDESIS_VERSION"
 )
 
 type SyndesisEnvVarConfig struct {
@@ -84,10 +86,8 @@ func GetEnvVars(syndesis *v1alpha1.Syndesis) map[string]string {
 }
 
 
-/*
- * List of specific extractors into Environment variables
- */
 
+// Common
 func envRouteHostname(syndesis *v1alpha1.Syndesis) *SyndesisEnvVarConfig {
 	if routeHost := syndesis.Spec.RouteHostName; routeHost != "" {
 		return &SyndesisEnvVarConfig{
@@ -166,10 +166,8 @@ func envImageStreamNamespace(syndesis *v1alpha1.Syndesis) *SyndesisEnvVarConfig 
 	return nil
 }
 
-/*
- * Postgres
- */
 
+// Postgresql
 func envPostgresqlMemoryLimit(syndesis *v1alpha1.Syndesis) *SyndesisEnvVarConfig {
 	if limits := syndesis.Spec.Components.Db.Resources.Limits.Memory(); limits != nil && limits.Value() > 0 {
 		return &SyndesisEnvVarConfig{
@@ -220,10 +218,8 @@ func envPostgresqlVolumeCapacity(syndesis *v1alpha1.Syndesis) *SyndesisEnvVarCon
 	return nil
 }
 
-/*
- * Prometheus
- */
 
+// Prometheus
 func envPrometheusMemoryLimit(syndesis *v1alpha1.Syndesis) *SyndesisEnvVarConfig {
 	if limits := syndesis.Spec.Components.Prometheus.Resources.Limits.Memory(); limits != nil && limits.Value() > 0 {
 		return &SyndesisEnvVarConfig{
@@ -244,10 +240,8 @@ func envPrometheusVolumeCapacity(syndesis *v1alpha1.Syndesis) *SyndesisEnvVarCon
 	return nil
 }
 
-/*
- * Prometheus
- */
 
+// Server
 func envServerMemoryLimit(syndesis *v1alpha1.Syndesis) *SyndesisEnvVarConfig {
 	if limits := syndesis.Spec.Components.Server.Resources.Limits.Memory(); limits != nil && limits.Value() > 0 {
 		return &SyndesisEnvVarConfig{
@@ -258,10 +252,8 @@ func envServerMemoryLimit(syndesis *v1alpha1.Syndesis) *SyndesisEnvVarConfig {
 	return nil
 }
 
-/*
- * Meta
- */
 
+// Meta
 func envMetaMemoryLimit(syndesis *v1alpha1.Syndesis) *SyndesisEnvVarConfig {
 	if limits := syndesis.Spec.Components.Meta.Resources.Limits.Memory(); limits != nil && limits.Value() > 0 {
 		return &SyndesisEnvVarConfig{

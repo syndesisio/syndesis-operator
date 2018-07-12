@@ -28,7 +28,9 @@ func NewTemplateProcessor(namespace string) (*TemplateProcessor, error) {
 	config.APIPath = "/apis"
 	config.AcceptContentTypes = "application/json"
 	config.ContentType = "application/json"
-	config.NegotiatedSerializer = basicNegotiatedSerializer{} // this gets used for discovery and error handling types
+
+	// this gets used for discovery and error handling types
+	config.NegotiatedSerializer = basicNegotiatedSerializer{}
 	if config.UserAgent == "" {
 		config.UserAgent = rest.DefaultKubernetesUserAgent()
 	}

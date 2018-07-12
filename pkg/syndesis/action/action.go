@@ -1,9 +1,17 @@
 package action
 
 import (
+	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/syndesisio/syndesis-operator/pkg/apis/syndesis/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+)
+
+const (
+	replaceResourcesIfPresent = true
 )
 
 type InstallationAction interface {
@@ -40,4 +48,35 @@ func setNamespaceAndOwnerReference(resource interface{}, syndesis *v1alpha1.Synd
 			}),
 		})
 	}
+}
+
+func createOrReplace(res runtime.Object) error {
+	return createOrReplaceForce(res, false)
+}
+
+func createOrReplaceForce(res runtime.Object, force bool) error {
+	if err := sdk.Create(res); err != nil && k8serrors.IsAlreadyExists(err) {
+		if force || canResourceBeReplaced(res) {
+			err = sdk.Delete(res, sdk.WithDeleteOptions(&metav1.DeleteOptions{}))
+			if err != nil {
+				return err
+			}
+			return sdk.Create(res)
+		} else {
+			return nil
+		}
+	} else {
+		return err
+	}
+}
+
+func canResourceBeReplaced(res runtime.Object) bool {
+	if !replaceResourcesIfPresent {
+		return false
+	}
+
+	if _, blacklisted := res.(*corev1.PersistentVolumeClaim); blacklisted {
+		return false
+	}
+	return true
 }

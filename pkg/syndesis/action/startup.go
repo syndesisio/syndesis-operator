@@ -10,8 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// Waits for all pods to startup, then mark Syndesis as "Running"
-
+// Waits for all pods to startup, then mark Syndesis as "Running".
 type Startup struct {}
 
 

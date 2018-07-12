@@ -4,6 +4,7 @@ import (
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
 	"github.com/syndesisio/syndesis-operator/pkg/apis/syndesis/v1alpha1"
+	"github.com/syndesisio/syndesis-operator/pkg/syndesis/version"
 )
 
 // Initializes a Syndesis resource with no status and starts the installation process
@@ -33,9 +34,15 @@ func (a *Initialize) Execute(syndesis *v1alpha1.Syndesis) error {
 		target.Status.Reason = v1alpha1.SyndesisStatusReasonDuplicate
 		logrus.Error("Cannot initialize Syndesis resource ", syndesis.Name, ": duplicate")
 	} else {
+		syndesisVersion, err := version.GetSyndesisVersionFromOperatorTemplate()
+		if err != nil {
+			return err
+		}
+
 		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusInstalling
 		target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
-		logrus.Info("Syndesis resource ", syndesis.Name, " initialized")
+		target.Status.Version = syndesisVersion
+		logrus.Info("Syndesis resource ", syndesis.Name, " initialized: installing version ", syndesisVersion)
 	}
 
 	return sdk.Update(target)

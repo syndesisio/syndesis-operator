@@ -1,26 +1,18 @@
 package action
 
 import (
-	"github.com/openshift/api/template/v1"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
 	"github.com/syndesisio/syndesis-operator/pkg/apis/syndesis/v1alpha1"
 	"github.com/syndesisio/syndesis-operator/pkg/openshift/serviceaccount"
-	"github.com/syndesisio/syndesis-operator/pkg/openshift/template"
-	"github.com/syndesisio/syndesis-operator/pkg/syndesis/configuration"
+	syndesistemplate "github.com/syndesisio/syndesis-operator/pkg/syndesis/template"
 	"github.com/syndesisio/syndesis-operator/pkg/util"
 	corev1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 )
 
-// Install syndesis into the namespace, taking resources from the template
-
-const (
-	replaceResourcesIfPresent = true
-)
-
+// Install syndesis into the namespace, taking resources from the bundled template.
 type Install struct {}
 
 
@@ -45,24 +37,9 @@ func (a *Install) Execute(syndesis *v1alpha1.Syndesis) error {
 		return err
 	}
 
-	res, err := util.LoadKubernetesResourceFromAsset("template.yaml")
-	if err != nil {
-		return err
-	}
-
-	templ := res.(*v1.Template)
-	processor, err := template.NewTemplateProcessor(syndesis.Namespace)
-	if err != nil {
-		return err
-	}
-
-	params := configuration.GetEnvVars(syndesis)
-	params[string(configuration.EnvOpenshiftOauthClientSecret)] = token
-
-	list, err := processor.Process(templ, params)
-	if err != nil {
-		return err
-	}
+	list, err := syndesistemplate.GetInstallResources(syndesis, syndesistemplate.InstallParams{
+		OAuthClientSecret: token,
+	})
 
 	for _, obj := range list {
 		res, err := util.LoadKubernetesResource(obj.Raw)
@@ -86,33 +63,6 @@ func (a *Install) Execute(syndesis *v1alpha1.Syndesis) error {
 	logrus.Info("Syndesis resource ", syndesis.Name, " installed")
 
 	return sdk.Update(target)
-}
-
-func createOrReplace(res runtime.Object) error {
-	if err := sdk.Create(res); err != nil && k8serrors.IsAlreadyExists(err) {
-		if canResourceBeReplaced(res) {
-			err = sdk.Delete(res, sdk.WithDeleteOptions(&metav1.DeleteOptions{}))
-			if err != nil {
-				return err
-			}
-			return sdk.Create(res)
-		} else {
-			return nil
-		}
-	} else {
-		return err
-	}
-}
-
-func canResourceBeReplaced(res runtime.Object) bool {
-	if !replaceResourcesIfPresent {
-		return false
-	}
-
-	if _, blacklisted := res.(*corev1.PersistentVolumeClaim); blacklisted {
-		return false
-	}
-	return true
 }
 
 func newSyndesisServiceAccount() *corev1.ServiceAccount {
