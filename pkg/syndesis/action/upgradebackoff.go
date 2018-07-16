@@ -10,7 +10,7 @@ import (
 
 const (
 	// Number of times a syndesis upgrade will be triggered (including the first one launched by another state)
-	UpgradeMaxAttempts = 4
+	UpgradeMaxAttempts = 5
 )
 
 // After a failure, waits a exponential amount of time, then retries
@@ -25,7 +25,7 @@ func (a *UpgradeBackoff) CanExecute(syndesis *v1alpha1.Syndesis) bool {
 func (a *UpgradeBackoff) Execute(syndesis *v1alpha1.Syndesis) error {
 
 	// Check number of attempts to fail fast
-	if syndesis.Status.UpgradeAttempts > UpgradeMaxAttempts {
+	if syndesis.Status.UpgradeAttempts >= UpgradeMaxAttempts {
 		logrus.Info("Upgrade of Syndesis resource ", syndesis.Name, " failed too many times and will not be retried")
 
 		target := syndesis.DeepCopy()
