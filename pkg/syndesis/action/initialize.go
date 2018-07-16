@@ -32,6 +32,7 @@ func (a *Initialize) Execute(syndesis *v1alpha1.Syndesis) error {
 		// We want one instance per namespace at most
 		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusNotInstalled
 		target.Status.Reason = v1alpha1.SyndesisStatusReasonDuplicate
+		target.Status.Description = "Cannot install two Syndesis resources in the same namespace"
 		logrus.Error("Cannot initialize Syndesis resource ", syndesis.Name, ": duplicate")
 	} else {
 		syndesisVersion, err := version.GetSyndesisVersionFromOperatorTemplate()
@@ -41,6 +42,7 @@ func (a *Initialize) Execute(syndesis *v1alpha1.Syndesis) error {
 
 		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusInstalling
 		target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
+		target.Status.Description = ""
 		target.Status.Version = syndesisVersion
 		logrus.Info("Syndesis resource ", syndesis.Name, " initialized: installing version ", syndesisVersion)
 	}

@@ -1585,6 +1585,7 @@ objects:
     metadata:
       name: syndesis-upgrade-${SYNDESIS_VERSION}
     spec:
+      serviceAccountName: syndesis-operator
       containers:
       - name: upgrade
         image: syndesis/syndesis-upgrade:${SYNDESIS_VERSION}

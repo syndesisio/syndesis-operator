@@ -12,11 +12,12 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"strings"
 	"time"
 )
 
 const (
-	UpgradePodServiceAccountName = "syndesis-operator"
+	UpgradePodPrefix = "syndesis-upgrade-"
 )
 
 // Upgrades Syndesis to the version supported by this operator using the upgrade template.
@@ -64,9 +65,6 @@ func (a *Upgrade) Execute(syndesis *v1alpha1.Syndesis) error {
 		if namespaceVersion != targetVersion {
 			logrus.Info("Upgrading syndesis resource ", syndesis.Name, " from version ", namespaceVersion, " to ", targetVersion)
 
-			// Set the correct service account for the upgrade pod
-			templateUpgradePod.Spec.ServiceAccountName = UpgradePodServiceAccountName
-
 			for _, res := range resources {
 				setNamespaceAndOwnerReference(res, syndesis)
 
@@ -107,6 +105,7 @@ func (a *Upgrade) Execute(syndesis *v1alpha1.Syndesis) error {
 				logrus.Warn("Upgrade pod terminated successfully but Syndesis version (", newNamespaceVersion, ") does not reflect target version (", targetVersion, ") for resource ", syndesis.Name, ". Forcing upgrade.")
 				target := syndesis.DeepCopy()
 				target.Status.ForceUpgrade = true
+				target.Status.TargetVersion = targetVersion
 
 				return sdk.Update(target)
 			}
@@ -117,6 +116,7 @@ func (a *Upgrade) Execute(syndesis *v1alpha1.Syndesis) error {
 			target := syndesis.DeepCopy()
 			target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusUpgradeFailureBackoff
 			target.Status.Reason = v1alpha1.SyndesisStatusReasonUpgradePodFailed
+			target.Status.Description = "Syndesis upgrade failed (it will be retried again)"
 			target.Status.LastUpgradeFailure = &metav1.Time{
 				Time: time.Now(),
 			}
@@ -136,7 +136,9 @@ func (a *Upgrade) Execute(syndesis *v1alpha1.Syndesis) error {
 func upgradeCompleted(syndesis *v1alpha1.Syndesis, newVersion string) error {
 	target := syndesis.DeepCopy()
 	target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusInstalled
+	target.Status.TargetVersion = ""
 	target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
+	target.Status.Description = ""
 	target.Status.Version = newVersion
 	target.Status.LastUpgradeFailure = nil
 	target.Status.UpgradeAttempts = 0
@@ -171,7 +173,9 @@ func (a *Upgrade) getUpgradeResources(syndesis *v1alpha1.Syndesis) ([]runtime.Ob
 func (a *Upgrade) findUpgradePod(resources []runtime.Object) (*v1.Pod, error) {
 	for _, res := range resources {
 		if pod, ok := res.(*v1.Pod); ok {
-			return pod, nil
+			if strings.HasPrefix(pod.Name, UpgradePodPrefix) {
+				return pod, nil
+			}
 		}
 	}
 	return nil, errors.New("upgrade pod not found")

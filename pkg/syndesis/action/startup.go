@@ -54,18 +54,21 @@ func (a *Startup) Execute(syndesis *v1alpha1.Syndesis) error {
 		target := syndesis.DeepCopy()
 		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusInstalled
 		target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
+		target.Status.Description = ""
 		logrus.Info("Syndesis resource ", syndesis.Name, " installed successfully")
 		return sdk.Update(target)
 	} else if failedDeployment != nil {
 		target := syndesis.DeepCopy()
 		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusStartupFailed
 		target.Status.Reason = v1alpha1.SyndesisStatusReasonDeploymentNotReady
+		target.Status.Description = "Some Syndesis deployments failed to startup within the allowed time frame"
 		logrus.Info("Startup failed for Syndesis resource ", syndesis.Name, ". Deployment ", *failedDeployment, " not ready")
 		return sdk.Update(target)
 	} else {
 		target := syndesis.DeepCopy()
 		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusStarting
 		target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
+		target.Status.Description = ""
 		logrus.Info("Waiting for Syndesis resource ", syndesis.Name, " to startup")
 		return sdk.Update(target)
 	}

@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	BackoffCap = 8 * time.Minute
+	// Number of times a syndesis upgrade will be triggered (including the first one launched by another state)
+	UpgradeMaxAttempts = 4
 )
 
 // After a failure, waits a exponential amount of time, then retries
@@ -22,6 +23,19 @@ func (a *UpgradeBackoff) CanExecute(syndesis *v1alpha1.Syndesis) bool {
 }
 
 func (a *UpgradeBackoff) Execute(syndesis *v1alpha1.Syndesis) error {
+
+	// Check number of attempts to fail fast
+	if syndesis.Status.UpgradeAttempts > UpgradeMaxAttempts {
+		logrus.Info("Upgrade of Syndesis resource ", syndesis.Name, " failed too many times and will not be retried")
+
+		target := syndesis.DeepCopy()
+		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusUpgradeFailed
+		target.Status.Reason = v1alpha1.SyndesisStatusReasonTooManyUpgradeAttempts
+		target.Status.Description = "Upgrade failed too many times and will not be retried"
+		target.Status.ForceUpgrade = false
+
+		return sdk.Update(target)
+	}
 
 	now := time.Now()
 
@@ -43,9 +57,6 @@ func (a *UpgradeBackoff) Execute(syndesis *v1alpha1.Syndesis) error {
 	}
 
 	delay := time.Duration(math.Pow(2, power)) * time.Minute
-	if delay > BackoffCap {
-		delay = BackoffCap
-	}
 
 	nextAttempt := lastFailure.Add(delay)
 
@@ -55,6 +66,7 @@ func (a *UpgradeBackoff) Execute(syndesis *v1alpha1.Syndesis) error {
 		target := syndesis.DeepCopy()
 		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusUpgrading
 		target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
+		target.Status.Description = ""
 		target.Status.ForceUpgrade = true
 
 		return sdk.Update(target)

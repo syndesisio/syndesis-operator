@@ -54,15 +54,17 @@ const (
 	SyndesisInstallationStatusNotInstalled          	SyndesisInstallationStatus = "NotInstalled"
 	SyndesisInstallationStatusUpgrading             	SyndesisInstallationStatus = "Upgrading"
 	SyndesisInstallationStatusUpgradeFailureBackoff 	SyndesisInstallationStatus = "UpgradeFailureBackoff"
+	SyndesisInstallationStatusUpgradeFailed				SyndesisInstallationStatus = "UpgradeFailed"
 )
 
 type SyndesisStatusReason string
 
 const (
-	SyndesisStatusReasonMissing				= ""
-	SyndesisStatusReasonDuplicate			= "Duplicate"
-	SyndesisStatusReasonDeploymentNotReady	= "DeploymentNotReady"
-	SyndesisStatusReasonUpgradePodFailed	= "UpgradePodFailed"
+	SyndesisStatusReasonMissing					= ""
+	SyndesisStatusReasonDuplicate				= "Duplicate"
+	SyndesisStatusReasonDeploymentNotReady		= "DeploymentNotReady"
+	SyndesisStatusReasonUpgradePodFailed		= "UpgradePodFailed"
+	SyndesisStatusReasonTooManyUpgradeAttempts	= "TooManyUpgradeAttempts"
 )
 
 type SyndesisStatus struct {
@@ -71,7 +73,9 @@ type SyndesisStatus struct {
 	LastUpgradeFailure	*metav1.Time				`json:"lastUpgradeFailure,omitempty"`
 	ForceUpgrade		bool						`json:"forceUpgrade,omitempty"`
 	Reason				SyndesisStatusReason		`json:"reason,omitempty"`
+	Description			string						`json:"description,omitempty"`
 	Version				string						`json:"version,omitempty"`
+	TargetVersion		string						`json:"targetVersion,omitempty"`
 }
 
 

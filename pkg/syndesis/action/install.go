@@ -59,6 +59,7 @@ func (a *Install) Execute(syndesis *v1alpha1.Syndesis) error {
 	target := syndesis.DeepCopy()
 	target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusStarting
 	target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
+	target.Status.Description = ""
 
 	logrus.Info("Syndesis resource ", syndesis.Name, " installed")
 
