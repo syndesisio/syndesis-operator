@@ -39,6 +39,8 @@ type SyndesisSpec struct {
 	IntegrationLimit 		*int        `json:"integrationLimit,omitempty"`
 	Registry 				string		`json:"registry,omitempty"`
 	Components       		Components  `json:"components,omitempty"`
+	OpenShiftConsoleUrl     string      `json:"openShiftConsoleUrl,omitempty"`
+
 }
 
 type SyndesisInstallationStatus string
