@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/syndesisio/syndesis-operator/pkg/apis/syndesis/v1alpha1"
 	"math"
+	"strconv"
 	"time"
 )
 
@@ -63,10 +64,14 @@ func (a *UpgradeBackoff) Execute(syndesis *v1alpha1.Syndesis) error {
 	if now.After(nextAttempt) {
 		logrus.Info("Restarting upgrade process for Syndesis resource ", syndesis.Name)
 
+		currentVersion := syndesis.Status.Version
+		targetVersion := syndesis.Status.TargetVersion
+		currentAttemptStr := strconv.Itoa(int(syndesis.Status.UpgradeAttempts + 1))
+
 		target := syndesis.DeepCopy()
 		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusUpgrading
 		target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
-		target.Status.Description = ""
+		target.Status.Description = "Upgrading from " + currentVersion + " to " + targetVersion + " (attempt " + currentAttemptStr + ")"
 		target.Status.ForceUpgrade = true
 
 		return sdk.Update(target)

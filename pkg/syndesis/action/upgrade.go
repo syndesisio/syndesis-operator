@@ -12,6 +12,7 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -74,14 +75,20 @@ func (a *Upgrade) Execute(syndesis *v1alpha1.Syndesis) error {
 				}
 			}
 
-			if syndesis.Status.ForceUpgrade {
-				target := syndesis.DeepCopy()
-				target.Status.ForceUpgrade = false
 
-				return sdk.Update(target)
-			} else {
-				return nil
+			var currentAttemptDescr string
+			if syndesis.Status.UpgradeAttempts > 0 {
+				currentAttemptDescr = " (attempt " + strconv.Itoa(int(syndesis.Status.UpgradeAttempts + 1)) + ")"
 			}
+
+			target := syndesis.DeepCopy()
+			target.Status.ForceUpgrade = false
+			// Set to avoid stale information in case of operator version change
+			target.Status.TargetVersion = targetVersion
+			target.Status.Description = "Upgrading from " + namespaceVersion + " to " + targetVersion + currentAttemptDescr
+
+
+			return sdk.Update(target)
 		} else {
 			// No upgrade pod, no version change: upgraded
 			logrus.Info("Syndesis resource ", syndesis.Name, " already upgraded to version ", targetVersion)
@@ -103,9 +110,16 @@ func (a *Upgrade) Execute(syndesis *v1alpha1.Syndesis) error {
 				return upgradeCompleted(syndesis, targetVersion)
 			} else {
 				logrus.Warn("Upgrade pod terminated successfully but Syndesis version (", newNamespaceVersion, ") does not reflect target version (", targetVersion, ") for resource ", syndesis.Name, ". Forcing upgrade.")
+
+				var currentAttemptDescr string
+				if syndesis.Status.UpgradeAttempts > 0 {
+					currentAttemptDescr = " (attempt " + strconv.Itoa(int(syndesis.Status.UpgradeAttempts + 1)) + ")"
+				}
+
 				target := syndesis.DeepCopy()
 				target.Status.ForceUpgrade = true
 				target.Status.TargetVersion = targetVersion
+				target.Status.Description = "Upgrading from " + namespaceVersion + " to " + targetVersion + currentAttemptDescr
 
 				return sdk.Update(target)
 			}
@@ -116,7 +130,7 @@ func (a *Upgrade) Execute(syndesis *v1alpha1.Syndesis) error {
 			target := syndesis.DeepCopy()
 			target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusUpgradeFailureBackoff
 			target.Status.Reason = v1alpha1.SyndesisStatusReasonUpgradePodFailed
-			target.Status.Description = "Syndesis upgrade failed (it will be retried again)"
+			target.Status.Description = "Syndesis upgrade from " + namespaceVersion + " to " + targetVersion + " failed (it will be retried again)"
 			target.Status.LastUpgradeFailure = &metav1.Time{
 				Time: time.Now(),
 			}

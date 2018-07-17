@@ -42,7 +42,7 @@ func (a *CheckUpdates) Execute(syndesis *v1alpha1.Syndesis) error {
 		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusUpgrading
 		target.Status.TargetVersion = a.operatorVersion
 		target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
-		target.Status.Description = ""
+		target.Status.Description = "Upgrading from " + namespaceVersion + " to " + a.operatorVersion
 		target.Status.LastUpgradeFailure = nil
 		target.Status.UpgradeAttempts = 0
 		target.Status.ForceUpgrade = false

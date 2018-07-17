@@ -82,7 +82,7 @@ func bindataGo() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "bindata.go", size: 0, mode: os.FileMode(436), modTime: time.Unix(1531757827, 0)}
+	info := bindataFileInfo{name: "bindata.go", size: 0, mode: os.FileMode(436), modTime: time.Unix(1531815038, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -102,7 +102,7 @@ func templateYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "template.yaml", size: 46163, mode: os.FileMode(436), modTime: time.Unix(1531756853, 0)}
+	info := bindataFileInfo{name: "template.yaml", size: 46163, mode: os.FileMode(436), modTime: time.Unix(1531815033, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
