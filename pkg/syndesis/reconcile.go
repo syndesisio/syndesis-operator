@@ -16,6 +16,9 @@ func init() {
 		&action.Initialize{},
 		&action.Install{},
 		&action.Startup{},
+		&action.CheckUpdates{},
+		&action.Upgrade{},
+		&action.UpgradeBackoff{},
 	)
 }
 

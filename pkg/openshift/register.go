@@ -1,3 +1,4 @@
+// Register all Openshift types that we want to manage.
 package openshift
 
 import (
@@ -11,10 +12,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/runtime"
 )
-
-/**
- * Register all Openshift types that we want to manage
- */
 
 func init() {
 	k8sutil.AddToSDKScheme(AddToScheme)

@@ -136,19 +136,19 @@ metadata:
   labels:
     app: syndesis
     syndesis.io/app: syndesis
-    syndesis.io/type: infrastructure
+    syndesis.io/type: operator
     syndesis.io/component: syndesis-operator
 spec:
   replicas: 1
   selector:
       syndesis.io/app: syndesis
-      syndesis.io/type: infrastructure
+      syndesis.io/type: operator
       syndesis.io/component: syndesis-operator
   template:
     metadata:
       labels:
         syndesis.io/app: syndesis
-        syndesis.io/type: infrastructure
+        syndesis.io/type: operator
         syndesis.io/component: syndesis-operator
     spec:
       serviceAccountName: syndesis-operator

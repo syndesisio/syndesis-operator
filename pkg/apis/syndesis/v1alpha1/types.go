@@ -46,25 +46,36 @@ type SyndesisSpec struct {
 type SyndesisInstallationStatus string
 
 const (
-	SyndesisInstallationStatusMissing			SyndesisInstallationStatus = ""
-	SyndesisInstallationStatusInstalling		SyndesisInstallationStatus = "Installing"
-	SyndesisInstallationStatusStarting			SyndesisInstallationStatus = "Starting"
-	SyndesisInstallationStatusStartupFailed		SyndesisInstallationStatus = "StartupFailed"
-	SyndesisInstallationStatusInstalled			SyndesisInstallationStatus = "Installed"
-	SyndesisInstallationStatusNotInstalled		SyndesisInstallationStatus = "NotInstalled"
+	SyndesisInstallationStatusMissing					SyndesisInstallationStatus = ""
+	SyndesisInstallationStatusInstalling            	SyndesisInstallationStatus = "Installing"
+	SyndesisInstallationStatusStarting              	SyndesisInstallationStatus = "Starting"
+	SyndesisInstallationStatusStartupFailed         	SyndesisInstallationStatus = "StartupFailed"
+	SyndesisInstallationStatusInstalled            		SyndesisInstallationStatus = "Installed"
+	SyndesisInstallationStatusNotInstalled          	SyndesisInstallationStatus = "NotInstalled"
+	SyndesisInstallationStatusUpgrading             	SyndesisInstallationStatus = "Upgrading"
+	SyndesisInstallationStatusUpgradeFailureBackoff 	SyndesisInstallationStatus = "UpgradeFailureBackoff"
+	SyndesisInstallationStatusUpgradeFailed				SyndesisInstallationStatus = "UpgradeFailed"
 )
 
 type SyndesisStatusReason string
 
 const (
-	SyndesisStatusReasonMissing				= ""
-	SyndesisStatusReasonDuplicate			= "Duplicate"
-	SyndesisStatusReasonDeploymentNotReady	= "DeploymentNotReady"
+	SyndesisStatusReasonMissing					= ""
+	SyndesisStatusReasonDuplicate				= "Duplicate"
+	SyndesisStatusReasonDeploymentNotReady		= "DeploymentNotReady"
+	SyndesisStatusReasonUpgradePodFailed		= "UpgradePodFailed"
+	SyndesisStatusReasonTooManyUpgradeAttempts	= "TooManyUpgradeAttempts"
 )
 
 type SyndesisStatus struct {
 	InstallationStatus	SyndesisInstallationStatus	`json:"installationStatus,omitempty"`
+	UpgradeAttempts		int32						`json:"upgradeAttempts,omitempty"`
+	LastUpgradeFailure	*metav1.Time				`json:"lastUpgradeFailure,omitempty"`
+	ForceUpgrade		bool						`json:"forceUpgrade,omitempty"`
 	Reason				SyndesisStatusReason		`json:"reason,omitempty"`
+	Description			string						`json:"description,omitempty"`
+	Version				string						`json:"version,omitempty"`
+	TargetVersion		string						`json:"targetVersion,omitempty"`
 }
 
 
