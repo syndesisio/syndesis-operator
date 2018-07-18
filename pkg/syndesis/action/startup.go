@@ -1,6 +1,7 @@
 package action
 
 import (
+	"errors"
 	"github.com/openshift/api/apps/v1"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
@@ -33,6 +34,10 @@ func (a *Startup) Execute(syndesis *v1alpha1.Syndesis) error {
 	}
 	if err := sdk.List(syndesis.Namespace, &list, options); err != nil {
 		return err
+	}
+
+	if len(list.Items) == 0 {
+		return errors.New("no deployment configs detected in the namespace")
 	}
 
 	ready := true

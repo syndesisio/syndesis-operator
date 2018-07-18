@@ -23,7 +23,6 @@ parameters:
 # Parameters with no defaults (has to be be provided when template is applied):
 - name: ROUTE_HOSTNAME
   description: The external hostname to access Syndesis
-  required: true
 # Parameters with defaults:
 - name: OPENSHIFT_MASTER
   description: Public OpenShift master address
@@ -829,6 +828,8 @@ objects:
       app: syndesis
       syndesis.io/app: syndesis
       syndesis.io/type: infrastructure
+    annotations:
+      console.alpha.openshift.io/overview-app-route: "true"
     name: syndesis
   spec:
     host: ${ROUTE_HOSTNAME}
