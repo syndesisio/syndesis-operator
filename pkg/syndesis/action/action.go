@@ -22,6 +22,8 @@ type InstallationAction interface {
 
 }
 
+type updateFunction func(runtime.Object)
+
 func syndesisInstallationStatusIs(syndesis *v1alpha1.Syndesis, statuses ...v1alpha1.SyndesisInstallationStatus) bool {
 	if syndesis == nil {
 		return false
@@ -68,6 +70,25 @@ func createOrReplaceForce(res runtime.Object, force bool) error {
 	} else {
 		return err
 	}
+}
+
+func updateOnLatestRevision(res runtime.Object, change updateFunction) error {
+	change(res)
+	err := sdk.Update(res)
+	if err != nil && k8serrors.IsConflict(err) {
+		attempts := 1
+		for attempts <= 5 && err != nil && k8serrors.IsConflict(err) {
+			err = sdk.Get(res)
+			if err != nil {
+				return err
+			}
+
+			change(res)
+			err = sdk.Update(res)
+			attempts++
+		}
+	}
+	return err
 }
 
 func canResourceBeReplaced(res runtime.Object) bool {
