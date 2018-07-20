@@ -25,7 +25,7 @@ func (a *Initialize) Execute(syndesis *v1alpha1.Syndesis) error {
 		return err
 	}
 
-	syndesisAlreadyInstalled, err := isSyndesisAlreadyInstalled(syndesis)
+	syndesisAlreadyInstalled, err := configuration.IsSyndesisConfigurationSecretPresent(syndesis.Namespace)
 	if err != nil {
 		return err
 	}
@@ -39,7 +39,7 @@ func (a *Initialize) Execute(syndesis *v1alpha1.Syndesis) error {
 		target.Status.Description = "Cannot install two Syndesis resources in the same namespace"
 		logrus.Error("Cannot initialize Syndesis resource ", syndesis.Name, ": duplicate")
 	} else if syndesisAlreadyInstalled {
-		// One Syndesis CR and Syndesis already installed: integrating the installation in the resource
+		// One uninitialized Syndesis CR and Syndesis already installed: attaching the installation to the resource
 		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusAttaching
 		target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
 		target.Status.Description = "Existing Syndesis installation detected: attaching it to Syndesis resource"
@@ -58,10 +58,4 @@ func (a *Initialize) Execute(syndesis *v1alpha1.Syndesis) error {
 	}
 
 	return sdk.Update(target)
-}
-
-func isSyndesisAlreadyInstalled(syndesis *v1alpha1.Syndesis) (bool, error) {
-	// Detects if the configmap with the version is present
-	v, err := configuration.GetSyndesisVersionFromNamespace(syndesis.Namespace)
-	return err == nil && v != "", err
 }

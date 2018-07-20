@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/syndesisio/syndesis-operator/pkg/syndesis/legacy"
 	"runtime"
 
 	// Load Openshift types
@@ -30,9 +31,15 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("Failed to get watch namespace: %v", err)
 	}
+
 	resyncPeriod := 5
+	ctx := context.TODO()
+
+	legacyController := legacy.NewLegacyController(namespace)
+	legacyController.Start(ctx)
+
 	logrus.Infof("Watching %s, %s, %s, %d", resource, kind, namespace, resyncPeriod)
 	sdk.Watch(resource, kind, namespace, resyncPeriod)
 	sdk.Handle(stub.NewHandler())
-	sdk.Run(context.TODO())
+	sdk.Run(ctx)
 }

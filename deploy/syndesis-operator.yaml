@@ -6,7 +6,7 @@ metadata:
   labels:
     app: syndesis
     syndesis.io/app: syndesis
-    syndesis.io/type: infrastructure
+    syndesis.io/type: operator
     syndesis.io/component: syndesis-operator
 ---
 kind: Role
@@ -16,7 +16,7 @@ metadata:
   labels:
     app: syndesis
     syndesis.io/app: syndesis
-    syndesis.io/type: infrastructure
+    syndesis.io/type: operator
     syndesis.io/component: syndesis-operator
 rules:
 - apiGroups:
@@ -89,7 +89,7 @@ metadata:
   labels:
     app: syndesis
     syndesis.io/app: syndesis
-    syndesis.io/type: infrastructure
+    syndesis.io/type: operator
     syndesis.io/component: syndesis-operator
 subjects:
 - kind: ServiceAccount
@@ -106,7 +106,7 @@ metadata:
   labels:
     app: syndesis
     syndesis.io/app: syndesis
-    syndesis.io/type: infrastructure
+    syndesis.io/type: operator
     syndesis.io/component: syndesis-operator
 subjects:
 - kind: ServiceAccount
@@ -121,7 +121,7 @@ metadata:
   labels:
     app: syndesis
     syndesis.io/app: syndesis
-    syndesis.io/type: infrastructure
+    syndesis.io/type: operator
     syndesis.io/component: syndesis-operator
 subjects:
 - kind: ServiceAccount
@@ -139,6 +139,8 @@ metadata:
     syndesis.io/type: operator
     syndesis.io/component: syndesis-operator
 spec:
+  strategy:
+    type: Recreate
   replicas: 1
   selector:
       syndesis.io/app: syndesis
