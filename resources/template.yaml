@@ -829,6 +829,8 @@ objects:
       app: syndesis
       syndesis.io/app: syndesis
       syndesis.io/type: infrastructure
+    annotations:
+      console.alpha.openshift.io/overview-app-route: "true"
     name: syndesis
   spec:
     host: ${ROUTE_HOSTNAME}

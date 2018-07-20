@@ -5,8 +5,8 @@ kind: "Syndesis"
 metadata:
   name: "example"
 spec:
-  # Name of the route how to access Syndesis
-  routeHostname: syndesis.192.168.64.79.nip.io
+  # Name of the route how to access Syndesis (optional)
+  #routeHostname: syndesis.192.168.64.79.nip.io
   # Enable demo data (or not)
   demoData: false
   # Should deployment of integrations be enabled?

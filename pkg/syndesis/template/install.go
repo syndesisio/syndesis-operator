@@ -14,6 +14,25 @@ type InstallParams struct {
 	OAuthClientSecret	string
 }
 
+func GetInstallResourcesAsRuntimeObjects(syndesis *v1alpha1.Syndesis, params InstallParams) ([]runtime.Object, error) {
+	rawExtensions, err := GetInstallResources(syndesis, params)
+	if err != nil {
+		return nil, err
+	}
+
+	objects := make([]runtime.Object, 0)
+
+	for _, rawObj := range rawExtensions {
+		res, err := util.LoadKubernetesResource(rawObj.Raw)
+		if err != nil {
+			return nil, err
+		}
+		objects = append(objects, res)
+	}
+
+	return objects, nil
+}
+
 func GetInstallResources(syndesis *v1alpha1.Syndesis, params InstallParams) ([]runtime.RawExtension, error) {
 	res, err := util.LoadKubernetesResourceFromAsset("template.yaml")
 	if err != nil {
