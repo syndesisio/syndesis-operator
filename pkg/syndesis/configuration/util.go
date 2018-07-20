@@ -35,14 +35,14 @@ func getInt(config map[string]string, key SyndesisEnvVar) (int, bool) {
 	return 0, false
 }
 
-func getQuantity(config map[string]string, key SyndesisEnvVar) (*resource.Quantity, bool) {
+func getQuantity(config map[string]string, key SyndesisEnvVar) (resource.Quantity, bool) {
 	if v, ok := config[string(key)]; ok {
 		q, err := resource.ParseQuantity(v)
 		if err != nil {
 			logrus.Warn(string(key), " property has not a quantity value: ", v)
-			return nil, false
+			return resource.Quantity{}, false
 		}
-		return &q, true
+		return q, true
 	}
-	return nil, false
+	return resource.Quantity{}, false
 }

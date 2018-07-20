@@ -2,6 +2,7 @@ package configuration
 
 import (
 	"github.com/syndesisio/syndesis-operator/pkg/apis/syndesis/v1alpha1"
+	"k8s.io/api/core/v1"
 	"strconv"
 )
 
@@ -245,7 +246,10 @@ func envPostgresqlMemoryLimit(syndesis *v1alpha1.Syndesis) *SyndesisEnvVarConfig
 }
 func postgresqlMemoryLimitFromEnv(config map[string]string, syndesis *v1alpha1.Syndesis) {
 	if v, ok := getQuantity(config, EnvPostgresqlMemoryLimit); ok {
-		syndesis.Spec.Components.Db.Resources.Limits.Memory().Set(v.Value())
+		if syndesis.Spec.Components.Db.Resources.Limits == nil {
+			syndesis.Spec.Components.Db.Resources.Limits = make(v1.ResourceList, 0)
+		}
+		syndesis.Spec.Components.Db.Resources.Limits[v1.ResourceMemory]=v
 	}
 }
 
@@ -323,7 +327,10 @@ func envPrometheusMemoryLimit(syndesis *v1alpha1.Syndesis) *SyndesisEnvVarConfig
 }
 func prometheusMemoryLimitFromEnv(config map[string]string, syndesis *v1alpha1.Syndesis) {
 	if v, ok := getQuantity(config, EnvPrometheusMemoryLimit); ok {
-		syndesis.Spec.Components.Prometheus.Resources.Limits.Memory().Set(v.Value())
+		if syndesis.Spec.Components.Prometheus.Resources.Limits == nil {
+			syndesis.Spec.Components.Prometheus.Resources.Limits = make(v1.ResourceList, 0)
+		}
+		syndesis.Spec.Components.Prometheus.Resources.Limits[v1.ResourceMemory]=v
 	}
 }
 
@@ -355,7 +362,10 @@ func envServerMemoryLimit(syndesis *v1alpha1.Syndesis) *SyndesisEnvVarConfig {
 }
 func serverMemoryLimitFromEnv(config map[string]string, syndesis *v1alpha1.Syndesis) {
 	if v, ok := getQuantity(config, EnvServerMemoryLimit); ok {
-		syndesis.Spec.Components.Server.Resources.Limits.Memory().Set(v.Value())
+		if syndesis.Spec.Components.Server.Resources.Limits == nil {
+			syndesis.Spec.Components.Server.Resources.Limits = make(v1.ResourceList, 0)
+		}
+		syndesis.Spec.Components.Server.Resources.Limits[v1.ResourceMemory]=v
 	}
 }
 
@@ -372,7 +382,10 @@ func envMetaMemoryLimit(syndesis *v1alpha1.Syndesis) *SyndesisEnvVarConfig {
 }
 func metaMemoryLimitFromEnv(config map[string]string, syndesis *v1alpha1.Syndesis) {
 	if v, ok := getQuantity(config, EnvMetaMemoryLimit); ok {
-		syndesis.Spec.Components.Meta.Resources.Limits.Memory().Set(v.Value())
+		if syndesis.Spec.Components.Meta.Resources.Limits == nil {
+			syndesis.Spec.Components.Meta.Resources.Limits = make(v1.ResourceList, 0)
+		}
+		syndesis.Spec.Components.Meta.Resources.Limits[v1.ResourceMemory]=v
 	}
 }
 
