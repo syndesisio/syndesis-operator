@@ -48,6 +48,8 @@ type SyndesisInstallationStatus string
 const (
 	SyndesisInstallationStatusMissing					SyndesisInstallationStatus = ""
 	SyndesisInstallationStatusInstalling            	SyndesisInstallationStatus = "Installing"
+	SyndesisInstallationStatusMerging		          	SyndesisInstallationStatus = "Merging"
+	SyndesisInstallationStatusAttaching		          	SyndesisInstallationStatus = "Attaching"
 	SyndesisInstallationStatusStarting              	SyndesisInstallationStatus = "Starting"
 	SyndesisInstallationStatusStartupFailed         	SyndesisInstallationStatus = "StartupFailed"
 	SyndesisInstallationStatusInstalled            		SyndesisInstallationStatus = "Installed"

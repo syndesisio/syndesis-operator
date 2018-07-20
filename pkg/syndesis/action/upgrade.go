@@ -6,7 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/syndesisio/syndesis-operator/pkg/apis/syndesis/v1alpha1"
 	syndesistemplate "github.com/syndesisio/syndesis-operator/pkg/syndesis/template"
-	"github.com/syndesisio/syndesis-operator/pkg/syndesis/version"
+	"github.com/syndesisio/syndesis-operator/pkg/syndesis/configuration"
 	"github.com/syndesisio/syndesis-operator/pkg/util"
 	"k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -32,14 +32,14 @@ func (a *Upgrade) CanExecute(syndesis *v1alpha1.Syndesis) bool {
 
 func (a *Upgrade) Execute(syndesis *v1alpha1.Syndesis) error {
 	if a.operatorVersion == "" {
-		operatorVersion, err := version.GetSyndesisVersionFromOperatorTemplate()
+		operatorVersion, err := configuration.GetSyndesisVersionFromOperatorTemplate()
 		if err != nil {
 			return err
 		}
 		a.operatorVersion = operatorVersion
 	}
 
-	namespaceVersion, err := version.GetSyndesisVersionFromNamespace(syndesis.Namespace)
+	namespaceVersion, err := configuration.GetSyndesisVersionFromNamespace(syndesis.Namespace)
 	if err != nil {
 		return err
 	}
@@ -100,7 +100,7 @@ func (a *Upgrade) Execute(syndesis *v1alpha1.Syndesis) error {
 			// Upgrade finished (correctly)
 
 			// Getting the namespace version again for double check
-			newNamespaceVersion, err := version.GetSyndesisVersionFromNamespace(syndesis.Namespace)
+			newNamespaceVersion, err := configuration.GetSyndesisVersionFromNamespace(syndesis.Namespace)
 			if err != nil {
 				return err
 			}
@@ -149,7 +149,7 @@ func (a *Upgrade) Execute(syndesis *v1alpha1.Syndesis) error {
 
 func upgradeCompleted(syndesis *v1alpha1.Syndesis, newVersion string) error {
 	target := syndesis.DeepCopy()
-	target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusInstalled
+	target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusAttaching
 	target.Status.TargetVersion = ""
 	target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
 	target.Status.Description = ""

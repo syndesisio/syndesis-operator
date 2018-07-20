@@ -1,5 +1,5 @@
 // Provides information on Syndesis versions.
-package version
+package configuration
 
 import (
 	"errors"
@@ -10,13 +10,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"strings"
 )
-
-
-const (
-	SyndesisGlobalConfigSecret			= "syndesis-global-config"
-	SyndesisGlobalConfigVersionProperty	= "syndesis"
-)
-
 
 // Each operator instance is bound to a single version currently that can be retrieved from this method.
 func GetSyndesisVersionFromOperatorTemplate() (string, error) {

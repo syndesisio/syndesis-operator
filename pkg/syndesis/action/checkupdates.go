@@ -4,7 +4,7 @@ import (
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
 	"github.com/syndesisio/syndesis-operator/pkg/apis/syndesis/v1alpha1"
-	"github.com/syndesisio/syndesis-operator/pkg/syndesis/version"
+	"github.com/syndesisio/syndesis-operator/pkg/syndesis/configuration"
 )
 
 // Checks if the syndesis installation should be upgraded and move to the "Upgrading" status.
@@ -21,14 +21,14 @@ func (a *CheckUpdates) CanExecute(syndesis *v1alpha1.Syndesis) bool {
 func (a *CheckUpdates) Execute(syndesis *v1alpha1.Syndesis) error {
 
 	if a.operatorVersion == "" {
-		operatorVersion, err := version.GetSyndesisVersionFromOperatorTemplate()
+		operatorVersion, err := configuration.GetSyndesisVersionFromOperatorTemplate()
 		if err != nil {
 			return err
 		}
 		a.operatorVersion = operatorVersion
 	}
 
-	namespaceVersion, err := version.GetSyndesisVersionFromNamespace(syndesis.Namespace)
+	namespaceVersion, err := configuration.GetSyndesisVersionFromNamespace(syndesis.Namespace)
 	if err != nil {
 		return err
 	}
