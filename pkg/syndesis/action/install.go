@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/syndesisio/syndesis-operator/pkg/apis/syndesis/v1alpha1"
 	"github.com/syndesisio/syndesis-operator/pkg/openshift/serviceaccount"
+	"github.com/syndesisio/syndesis-operator/pkg/syndesis/common"
 	syndesistemplate "github.com/syndesisio/syndesis-operator/pkg/syndesis/template"
 	corev1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -81,7 +82,7 @@ func (a *Install) Execute(syndesis *v1alpha1.Syndesis) error {
 			continue
 		}
 
-		setNamespaceAndOwnerReference(res, syndesis)
+		common.SetNamespaceAndOwnerReference(res, syndesis)
 
 		err = createOrReplace(res)
 		if err != nil && !k8serrors.IsAlreadyExists(err) {
@@ -102,7 +103,7 @@ func (a *Install) Execute(syndesis *v1alpha1.Syndesis) error {
 
 func installServiceAccount(syndesis *v1alpha1.Syndesis) (string, error) {
 	sa := newSyndesisServiceAccount()
-	setNamespaceAndOwnerReference(sa, syndesis)
+	common.SetNamespaceAndOwnerReference(sa, syndesis)
 	// We don't replace the service account if already present, to let Kubernetes generate its tokens
 	err := sdk.Create(sa)
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
@@ -142,7 +143,7 @@ func installSyndesisRoute(syndesis *v1alpha1.Syndesis, objects []runtime.Object,
 		return nil, err
 	}
 
-	setNamespaceAndOwnerReference(route, syndesis)
+	common.SetNamespaceAndOwnerReference(route, syndesis)
 
 	if autoGenerate {
 		route.Spec.Host = ""

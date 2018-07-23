@@ -25,11 +25,6 @@ func (a *Initialize) Execute(syndesis *v1alpha1.Syndesis) error {
 		return err
 	}
 
-	syndesisAlreadyInstalled, err := configuration.IsSyndesisConfigurationSecretPresent(syndesis.Namespace)
-	if err != nil {
-		return err
-	}
-
 	target := syndesis.DeepCopy()
 
 	if len(list.Items) > 1 {
@@ -38,12 +33,6 @@ func (a *Initialize) Execute(syndesis *v1alpha1.Syndesis) error {
 		target.Status.Reason = v1alpha1.SyndesisStatusReasonDuplicate
 		target.Status.Description = "Cannot install two Syndesis resources in the same namespace"
 		logrus.Error("Cannot initialize Syndesis resource ", syndesis.Name, ": duplicate")
-	} else if syndesisAlreadyInstalled {
-		// One uninitialized Syndesis CR and Syndesis already installed: attaching the installation to the resource
-		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusAttaching
-		target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
-		target.Status.Description = "Existing Syndesis installation detected: attaching it to Syndesis resource"
-		logrus.Info("Existing Syndesis installation detected: attaching it to Syndesis resource ", syndesis.Name)
 	} else {
 		syndesisVersion, err := configuration.GetSyndesisVersionFromOperatorTemplate()
 		if err != nil {

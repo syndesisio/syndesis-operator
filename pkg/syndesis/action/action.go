@@ -7,7 +7,6 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 const (
@@ -36,20 +35,6 @@ func syndesisInstallationStatusIs(syndesis *v1alpha1.Syndesis, statuses ...v1alp
 		}
 	}
 	return false
-}
-
-func setNamespaceAndOwnerReference(resource interface{}, syndesis *v1alpha1.Syndesis) {
-	if kObj, ok := resource.(metav1.Object); ok {
-		kObj.SetNamespace(syndesis.Namespace)
-
-		kObj.SetOwnerReferences([]metav1.OwnerReference{
-			*metav1.NewControllerRef(syndesis, schema.GroupVersionKind{
-				Group:   v1alpha1.SchemeGroupVersion.Group,
-				Version: v1alpha1.SchemeGroupVersion.Version,
-				Kind:    syndesis.Kind,
-			}),
-		})
-	}
 }
 
 func createOrReplace(res runtime.Object) error {

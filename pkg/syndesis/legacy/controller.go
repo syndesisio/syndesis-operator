@@ -6,9 +6,9 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/syndesisio/syndesis-operator/pkg/apis/syndesis/v1alpha1"
 	"github.com/syndesisio/syndesis-operator/pkg/syndesis/configuration"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"time"
-	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
 const (
@@ -70,9 +70,19 @@ func (c *LegacyController) doVerifyAndCreate() error {
 				Name: syndesisResourceName,
 			},
 			Status: v1alpha1.SyndesisStatus{
-				InstallationStatus: v1alpha1.SyndesisInstallationStatusMerging,
+				InstallationStatus: v1alpha1.SyndesisInstallationStatusUpgradingLegacy,
+				Reason: v1alpha1.SyndesisStatusReasonMissing,
 			},
 		}
+
+		logrus.Info("Merging Syndesis legacy configuration into resource ", syndesisResourceName)
+
+		config, err := configuration.GetSyndesisEnvVarsFromOpenshiftNamespace(c.namespace)
+		if err != nil {
+			return nil
+		}
+
+		configuration.SetConfigurationFromEnvVars(config, &synd)
 
 		logrus.Info("Creating a new Syndesis resource from legacy installation in the ", c.namespace, " namespace")
 		return sdk.Create(&synd)
