@@ -18,8 +18,7 @@ A summary of the states:
 * **Upgrading**: The operator has detected that there's a new version and it has already started the upgrade process
 * **UpgradeFailureBackoff**: A problem has occurred during the upgrade. Everything should have been restored and the upgrade process will be retried with a exponential delay (up to a maximum number of times)
 * **UpgradeFailed**: After the maximum amount of failed upgrades, the upgrade will not be tried anymore. The CR needs a manual action to move away from here
-* **Merging**: The CR can go into this state only if the operator has detected that there's a legacy installation of Syndesis in the watched namespace and there's no Syndesis resource that can own it in the same namespace. The operator then creates a Syndesis resource in the `Merging` state and copies the configuration from the legacy environment variables into it
-* **Attaching**: The operator is ensuring that all syndesis resources installed are owned by the active Syndesis custom resource, so that e.g. deleting the custom resource deletes also the dependent resources
+* **UpgradingLegacy**: The CR can go into this state only if the operator has detected that there's a legacy installation of Syndesis in the watched namespace and there's no Syndesis resource that can own it in the same namespace. The operator then creates a Syndesis resource using a configuration inferred from the legacy environment variables
 
 
 ## Requirements
