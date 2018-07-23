@@ -25,7 +25,7 @@ type Install struct {}
 
 
 func (a *Install) CanExecute(syndesis *v1alpha1.Syndesis) bool {
-	return syndesisInstallationStatusIs(syndesis, v1alpha1.SyndesisInstallationStatusInstalling)
+	return syndesisPhaseIs(syndesis, v1alpha1.SyndesisPhaseInstalling)
 }
 
 func (a *Install) Execute(syndesis *v1alpha1.Syndesis) error {
@@ -92,7 +92,7 @@ func (a *Install) Execute(syndesis *v1alpha1.Syndesis) error {
 
 	// Installation completed, set the next state
 	target := originalSyndesis.DeepCopy()
-	target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusStarting
+	target.Status.Phase = v1alpha1.SyndesisPhaseStarting
 	target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
 	target.Status.Description = ""
 

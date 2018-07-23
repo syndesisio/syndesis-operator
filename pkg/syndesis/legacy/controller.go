@@ -70,7 +70,7 @@ func (c *LegacyController) doVerifyAndCreate() error {
 				Name: syndesisResourceName,
 			},
 			Status: v1alpha1.SyndesisStatus{
-				InstallationStatus: v1alpha1.SyndesisInstallationStatusUpgradingLegacy,
+				Phase: v1alpha1.SyndesisPhaseUpgradingLegacy,
 				Reason: v1alpha1.SyndesisStatusReasonMissing,
 			},
 		}

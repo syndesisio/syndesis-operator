@@ -43,19 +43,19 @@ type SyndesisSpec struct {
 
 }
 
-type SyndesisInstallationStatus string
+type SyndesisPhase string
 
 const (
-	SyndesisInstallationStatusMissing					SyndesisInstallationStatus = ""
-	SyndesisInstallationStatusInstalling            	SyndesisInstallationStatus = "Installing"
-	SyndesisInstallationStatusUpgradingLegacy          	SyndesisInstallationStatus = "UpgradingLegacy"
-	SyndesisInstallationStatusStarting              	SyndesisInstallationStatus = "Starting"
-	SyndesisInstallationStatusStartupFailed         	SyndesisInstallationStatus = "StartupFailed"
-	SyndesisInstallationStatusInstalled            		SyndesisInstallationStatus = "Installed"
-	SyndesisInstallationStatusNotInstalled          	SyndesisInstallationStatus = "NotInstalled"
-	SyndesisInstallationStatusUpgrading             	SyndesisInstallationStatus = "Upgrading"
-	SyndesisInstallationStatusUpgradeFailureBackoff 	SyndesisInstallationStatus = "UpgradeFailureBackoff"
-	SyndesisInstallationStatusUpgradeFailed				SyndesisInstallationStatus = "UpgradeFailed"
+	SyndesisPhaseMissing				SyndesisPhase = ""
+	SyndesisPhaseInstalling            	SyndesisPhase = "Installing"
+	SyndesisPhaseUpgradingLegacy        SyndesisPhase = "UpgradingLegacy"
+	SyndesisPhaseStarting              	SyndesisPhase = "Starting"
+	SyndesisPhaseStartupFailed         	SyndesisPhase = "StartupFailed"
+	SyndesisPhaseInstalled            	SyndesisPhase = "Installed"
+	SyndesisPhaseNotInstalled          	SyndesisPhase = "NotInstalled"
+	SyndesisPhaseUpgrading             	SyndesisPhase = "Upgrading"
+	SyndesisPhaseUpgradeFailureBackoff 	SyndesisPhase = "UpgradeFailureBackoff"
+	SyndesisPhaseUpgradeFailed			SyndesisPhase = "UpgradeFailed"
 )
 
 type SyndesisStatusReason string
@@ -69,7 +69,7 @@ const (
 )
 
 type SyndesisStatus struct {
-	InstallationStatus	SyndesisInstallationStatus	`json:"installationStatus,omitempty"`
+	Phase				SyndesisPhase				`json:"installationStatus,omitempty"`
 	UpgradeAttempts		int32						`json:"upgradeAttempts,omitempty"`
 	LastUpgradeFailure	*metav1.Time				`json:"lastUpgradeFailure,omitempty"`
 	ForceUpgrade		bool						`json:"forceUpgrade,omitempty"`

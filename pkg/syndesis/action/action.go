@@ -23,12 +23,12 @@ type InstallationAction interface {
 
 type updateFunction func(runtime.Object)
 
-func syndesisInstallationStatusIs(syndesis *v1alpha1.Syndesis, statuses ...v1alpha1.SyndesisInstallationStatus) bool {
+func syndesisPhaseIs(syndesis *v1alpha1.Syndesis, statuses ...v1alpha1.SyndesisPhase) bool {
 	if syndesis == nil {
 		return false
 	}
 
-	currentStatus := syndesis.Status.InstallationStatus
+	currentStatus := syndesis.Status.Phase
 	for _, status := range statuses {
 		if currentStatus == status {
 			return true

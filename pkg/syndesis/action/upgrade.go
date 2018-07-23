@@ -28,7 +28,7 @@ type Upgrade struct {
 }
 
 func (a *Upgrade) CanExecute(syndesis *v1alpha1.Syndesis) bool {
-	return syndesisInstallationStatusIs(syndesis, v1alpha1.SyndesisInstallationStatusUpgrading)
+	return syndesisPhaseIs(syndesis, v1alpha1.SyndesisPhaseUpgrading)
 }
 
 func (a *Upgrade) Execute(syndesis *v1alpha1.Syndesis) error {
@@ -129,7 +129,7 @@ func (a *Upgrade) Execute(syndesis *v1alpha1.Syndesis) error {
 			logrus.Warn("Failure while upgrading Syndesis resource ", syndesis.Name, " to version ", targetVersion, ": upgrade pod failure")
 
 			target := syndesis.DeepCopy()
-			target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusUpgradeFailureBackoff
+			target.Status.Phase = v1alpha1.SyndesisPhaseUpgradeFailureBackoff
 			target.Status.Reason = v1alpha1.SyndesisStatusReasonUpgradePodFailed
 			target.Status.Description = "Syndesis upgrade from " + namespaceVersion + " to " + targetVersion + " failed (it will be retried again)"
 			target.Status.LastUpgradeFailure = &metav1.Time{
@@ -155,7 +155,7 @@ func completeUpgrade(syndesis *v1alpha1.Syndesis, newVersion string) error {
 	}
 
 	target := syndesis.DeepCopy()
-	target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusInstalled
+	target.Status.Phase = v1alpha1.SyndesisPhaseInstalled
 	target.Status.TargetVersion = ""
 	target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
 	target.Status.Description = ""

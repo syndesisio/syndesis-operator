@@ -12,9 +12,9 @@ type Initialize struct {}
 
 
 func (a *Initialize) CanExecute(syndesis *v1alpha1.Syndesis) bool {
-	return syndesisInstallationStatusIs(syndesis,
-		v1alpha1.SyndesisInstallationStatusMissing,
-		v1alpha1.SyndesisInstallationStatusNotInstalled)
+	return syndesisPhaseIs(syndesis,
+		v1alpha1.SyndesisPhaseMissing,
+		v1alpha1.SyndesisPhaseNotInstalled)
 }
 
 func (a *Initialize) Execute(syndesis *v1alpha1.Syndesis) error {
@@ -29,7 +29,7 @@ func (a *Initialize) Execute(syndesis *v1alpha1.Syndesis) error {
 
 	if len(list.Items) > 1 {
 		// We want one instance per namespace at most
-		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusNotInstalled
+		target.Status.Phase = v1alpha1.SyndesisPhaseNotInstalled
 		target.Status.Reason = v1alpha1.SyndesisStatusReasonDuplicate
 		target.Status.Description = "Cannot install two Syndesis resources in the same namespace"
 		logrus.Error("Cannot initialize Syndesis resource ", syndesis.Name, ": duplicate")
@@ -39,7 +39,7 @@ func (a *Initialize) Execute(syndesis *v1alpha1.Syndesis) error {
 			return err
 		}
 
-		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusInstalling
+		target.Status.Phase = v1alpha1.SyndesisPhaseInstalling
 		target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
 		target.Status.Description = ""
 		target.Status.Version = syndesisVersion

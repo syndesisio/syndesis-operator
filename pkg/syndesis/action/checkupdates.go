@@ -13,9 +13,9 @@ type CheckUpdates struct {
 }
 
 func (a *CheckUpdates) CanExecute(syndesis *v1alpha1.Syndesis) bool {
-	return syndesisInstallationStatusIs(syndesis,
-		v1alpha1.SyndesisInstallationStatusInstalled,
-		v1alpha1.SyndesisInstallationStatusStartupFailed)
+	return syndesisPhaseIs(syndesis,
+		v1alpha1.SyndesisPhaseInstalled,
+		v1alpha1.SyndesisPhaseStartupFailed)
 }
 
 func (a *CheckUpdates) Execute(syndesis *v1alpha1.Syndesis) error {
@@ -39,7 +39,7 @@ func (a *CheckUpdates) Execute(syndesis *v1alpha1.Syndesis) error {
 	} else {
 		// Let's start the upgrade process
 		target := syndesis.DeepCopy()
-		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusUpgrading
+		target.Status.Phase = v1alpha1.SyndesisPhaseUpgrading
 		target.Status.TargetVersion = a.operatorVersion
 		target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
 		target.Status.Description = "Upgrading from " + namespaceVersion + " to " + a.operatorVersion

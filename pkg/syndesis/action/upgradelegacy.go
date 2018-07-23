@@ -14,7 +14,7 @@ type UpgradeLegacy struct {}
 
 
 func (a *UpgradeLegacy) CanExecute(syndesis *v1alpha1.Syndesis) bool {
-	return syndesisInstallationStatusIs(syndesis, v1alpha1.SyndesisInstallationStatusUpgradingLegacy)
+	return syndesisPhaseIs(syndesis, v1alpha1.SyndesisPhaseUpgradingLegacy)
 }
 
 func (a *UpgradeLegacy) Execute(syndesis *v1alpha1.Syndesis) error {
@@ -38,7 +38,7 @@ func (a *UpgradeLegacy) Execute(syndesis *v1alpha1.Syndesis) error {
 	}
 
 	target := syndesis.DeepCopy()
-	target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusStarting
+	target.Status.Phase = v1alpha1.SyndesisPhaseStarting
 	target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
 	target.Status.Description = ""
 	target.Status.Version = syndesisVersion
@@ -56,8 +56,8 @@ func isAnotherActiveInstallationPresent(syndesis *v1alpha1.Syndesis) (bool, erro
 
 	for _, that := range lst.Items {
 		if that.Name != syndesis.Name &&
-			that.Status.InstallationStatus != v1alpha1.SyndesisInstallationStatusNotInstalled &&
-			that.Status.InstallationStatus != v1alpha1.SyndesisStatusReasonMissing {
+			that.Status.Phase != v1alpha1.SyndesisPhaseNotInstalled &&
+			that.Status.Phase != v1alpha1.SyndesisStatusReasonMissing {
 				return true, nil
 		}
 	}
