@@ -14,14 +14,12 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-
 const (
 	SyndesisRouteName = "syndesis"
 )
 
 // Install syndesis into the namespace, taking resources from the bundled template.
-type Install struct {}
-
+type Install struct{}
 
 func (a *Install) CanExecute(syndesis *v1alpha1.Syndesis) bool {
 	return syndesisInstallationStatusIs(syndesis, v1alpha1.SyndesisInstallationStatusInstalling)
@@ -94,8 +92,8 @@ func (a *Install) Execute(syndesis *v1alpha1.Syndesis) error {
 	target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusStarting
 	target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
 	target.Status.Description = ""
-
-	logrus.Info("Syndesis resource ", syndesis.Name, " installed")
+	addRouteAnnotation(target, syndesisRoute)
+	logrus.Info("Syndesis resource ", target.Name, " installed")
 
 	return sdk.Update(target)
 }
@@ -112,21 +110,20 @@ func installServiceAccount(syndesis *v1alpha1.Syndesis) (string, error) {
 	return serviceaccount.GetServiceAccountToken(sa.Name, syndesis.Namespace)
 }
 
-
 func newSyndesisServiceAccount() *corev1.ServiceAccount {
 	sa := corev1.ServiceAccount{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "v1",
-			Kind: "ServiceAccount",
+			Kind:       "ServiceAccount",
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "syndesis-oauth-client",
 			Labels: map[string]string{
 				"app": "syndesis",
 			},
-			Annotations: map[string]string {
-				"serviceaccounts.openshift.io/oauth-redirecturi.local": "https://localhost:4200",
-				"serviceaccounts.openshift.io/oauth-redirecturi.route": "https://",
+			Annotations: map[string]string{
+				"serviceaccounts.openshift.io/oauth-redirecturi.local":       "https://localhost:4200",
+				"serviceaccounts.openshift.io/oauth-redirecturi.route":       "https://",
 				"serviceaccounts.openshift.io/oauth-redirectreference.route": `{"kind": "OAuthRedirectReference", "apiVersion": "v1", "reference": {"kind": "Route","name": "syndesis"}}`,
 			},
 		},
@@ -135,6 +132,21 @@ func newSyndesisServiceAccount() *corev1.ServiceAccount {
 	return &sa
 }
 
+func addRouteAnnotation(syndesis *v1alpha1.Syndesis, route *v1.Route) {
+	annotations := syndesis.ObjectMeta.Annotations
+	if annotations == nil {
+		annotations = make(map[string]string)
+		syndesis.ObjectMeta.Annotations = annotations
+	}
+	annotations["syndesis.io/applicationUrl"] = extractApplicationUrl(route)
+}
+func extractApplicationUrl(route *v1.Route) string {
+	scheme := "http"
+	if route.Spec.TLS != nil {
+		scheme = "https"
+	}
+	return scheme + "://" + route.Spec.Host
+}
 
 func installSyndesisRoute(syndesis *v1alpha1.Syndesis, objects []runtime.Object, autoGenerate bool) (*v1.Route, error) {
 	route, err := findSyndesisRoute(objects)

@@ -60,11 +60,11 @@ const (
 type SyndesisStatusReason string
 
 const (
-	SyndesisStatusReasonMissing					= ""
-	SyndesisStatusReasonDuplicate				= "Duplicate"
-	SyndesisStatusReasonDeploymentNotReady		= "DeploymentNotReady"
-	SyndesisStatusReasonUpgradePodFailed		= "UpgradePodFailed"
-	SyndesisStatusReasonTooManyUpgradeAttempts	= "TooManyUpgradeAttempts"
+	SyndesisStatusReasonMissing					SyndesisStatusReason = ""
+	SyndesisStatusReasonDuplicate				SyndesisStatusReason = "Duplicate"
+	SyndesisStatusReasonDeploymentNotReady		SyndesisStatusReason = "DeploymentNotReady"
+	SyndesisStatusReasonUpgradePodFailed		SyndesisStatusReason = "UpgradePodFailed"
+	SyndesisStatusReasonTooManyUpgradeAttempts	SyndesisStatusReason = "TooManyUpgradeAttempts"
 )
 
 type SyndesisStatus struct {
