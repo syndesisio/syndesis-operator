@@ -20,7 +20,7 @@ type UpgradeBackoff struct {
 }
 
 func (a *UpgradeBackoff) CanExecute(syndesis *v1alpha1.Syndesis) bool {
-	return syndesisInstallationStatusIs(syndesis, v1alpha1.SyndesisInstallationStatusUpgradeFailureBackoff)
+	return syndesisPhaseIs(syndesis, v1alpha1.SyndesisPhaseUpgradeFailureBackoff)
 }
 
 func (a *UpgradeBackoff) Execute(syndesis *v1alpha1.Syndesis) error {
@@ -30,7 +30,7 @@ func (a *UpgradeBackoff) Execute(syndesis *v1alpha1.Syndesis) error {
 		logrus.Info("Upgrade of Syndesis resource ", syndesis.Name, " failed too many times and will not be retried")
 
 		target := syndesis.DeepCopy()
-		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusUpgradeFailed
+		target.Status.Phase = v1alpha1.SyndesisPhaseUpgradeFailed
 		target.Status.Reason = v1alpha1.SyndesisStatusReasonTooManyUpgradeAttempts
 		target.Status.Description = "Upgrade failed too many times and will not be retried"
 		target.Status.ForceUpgrade = false
@@ -69,7 +69,7 @@ func (a *UpgradeBackoff) Execute(syndesis *v1alpha1.Syndesis) error {
 		currentAttemptStr := strconv.Itoa(int(syndesis.Status.UpgradeAttempts + 1))
 
 		target := syndesis.DeepCopy()
-		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusUpgrading
+		target.Status.Phase = v1alpha1.SyndesisPhaseUpgrading
 		target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
 		target.Status.Description = "Upgrading from " + currentVersion + " to " + targetVersion + " (attempt " + currentAttemptStr + ")"
 		target.Status.ForceUpgrade = true

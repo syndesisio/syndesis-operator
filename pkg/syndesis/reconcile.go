@@ -13,6 +13,7 @@ var (
 
 func init() {
 	actionPool = append(actionPool,
+		&action.UpgradeLegacy{},
 		&action.Initialize{},
 		&action.Install{},
 		&action.Startup{},

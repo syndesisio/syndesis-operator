@@ -1,22 +1,13 @@
 // Provides information on Syndesis versions.
-package version
+package configuration
 
 import (
 	"errors"
 	templatev1 "github.com/openshift/api/template/v1"
-	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/syndesisio/syndesis-operator/pkg/util"
 	"k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"strings"
 )
-
-
-const (
-	SyndesisGlobalConfigSecret			= "syndesis-global-config"
-	SyndesisGlobalConfigVersionProperty	= "syndesis"
-)
-
 
 // Each operator instance is bound to a single version currently that can be retrieved from this method.
 func GetSyndesisVersionFromOperatorTemplate() (string, error) {
@@ -41,21 +32,12 @@ func GetSyndesisVersionFromOperatorTemplate() (string, error) {
 
 // Retrieves the version of syndesis installed in the namespace.
 func GetSyndesisVersionFromNamespace(namespace string) (string, error) {
-	secret := v1.Secret{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: "v1",
-			Kind: "Secret",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: namespace,
-			Name: SyndesisGlobalConfigSecret,
-		},
-	}
-	if err := sdk.Get(&secret); err != nil {
+	secret, err := GetSyndesisConfigurationSecret(namespace)
+	if err != nil {
 		return "", err
 	}
 
-	return GetSyndesisVersion(&secret)
+	return GetSyndesisVersion(secret)
 }
 
 // Extracts the Syndesis version from the configuration secret.

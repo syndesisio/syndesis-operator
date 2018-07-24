@@ -4,7 +4,7 @@ import (
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
 	"github.com/syndesisio/syndesis-operator/pkg/apis/syndesis/v1alpha1"
-	"github.com/syndesisio/syndesis-operator/pkg/syndesis/version"
+	"github.com/syndesisio/syndesis-operator/pkg/syndesis/configuration"
 )
 
 // Checks if the syndesis installation should be upgraded and move to the "Upgrading" status.
@@ -13,22 +13,22 @@ type CheckUpdates struct {
 }
 
 func (a *CheckUpdates) CanExecute(syndesis *v1alpha1.Syndesis) bool {
-	return syndesisInstallationStatusIs(syndesis,
-		v1alpha1.SyndesisInstallationStatusInstalled,
-		v1alpha1.SyndesisInstallationStatusStartupFailed)
+	return syndesisPhaseIs(syndesis,
+		v1alpha1.SyndesisPhaseInstalled,
+		v1alpha1.SyndesisPhaseStartupFailed)
 }
 
 func (a *CheckUpdates) Execute(syndesis *v1alpha1.Syndesis) error {
 
 	if a.operatorVersion == "" {
-		operatorVersion, err := version.GetSyndesisVersionFromOperatorTemplate()
+		operatorVersion, err := configuration.GetSyndesisVersionFromOperatorTemplate()
 		if err != nil {
 			return err
 		}
 		a.operatorVersion = operatorVersion
 	}
 
-	namespaceVersion, err := version.GetSyndesisVersionFromNamespace(syndesis.Namespace)
+	namespaceVersion, err := configuration.GetSyndesisVersionFromNamespace(syndesis.Namespace)
 	if err != nil {
 		return err
 	}
@@ -39,7 +39,7 @@ func (a *CheckUpdates) Execute(syndesis *v1alpha1.Syndesis) error {
 	} else {
 		// Let's start the upgrade process
 		target := syndesis.DeepCopy()
-		target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusUpgrading
+		target.Status.Phase = v1alpha1.SyndesisPhaseUpgrading
 		target.Status.TargetVersion = a.operatorVersion
 		target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
 		target.Status.Description = "Upgrading from " + namespaceVersion + " to " + a.operatorVersion

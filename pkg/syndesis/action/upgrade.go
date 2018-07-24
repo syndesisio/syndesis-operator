@@ -5,8 +5,9 @@ import (
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
 	"github.com/syndesisio/syndesis-operator/pkg/apis/syndesis/v1alpha1"
+	"github.com/syndesisio/syndesis-operator/pkg/syndesis/operation"
 	syndesistemplate "github.com/syndesisio/syndesis-operator/pkg/syndesis/template"
-	"github.com/syndesisio/syndesis-operator/pkg/syndesis/version"
+	"github.com/syndesisio/syndesis-operator/pkg/syndesis/configuration"
 	"github.com/syndesisio/syndesis-operator/pkg/util"
 	"k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -27,19 +28,19 @@ type Upgrade struct {
 }
 
 func (a *Upgrade) CanExecute(syndesis *v1alpha1.Syndesis) bool {
-	return syndesisInstallationStatusIs(syndesis, v1alpha1.SyndesisInstallationStatusUpgrading)
+	return syndesisPhaseIs(syndesis, v1alpha1.SyndesisPhaseUpgrading)
 }
 
 func (a *Upgrade) Execute(syndesis *v1alpha1.Syndesis) error {
 	if a.operatorVersion == "" {
-		operatorVersion, err := version.GetSyndesisVersionFromOperatorTemplate()
+		operatorVersion, err := configuration.GetSyndesisVersionFromOperatorTemplate()
 		if err != nil {
 			return err
 		}
 		a.operatorVersion = operatorVersion
 	}
 
-	namespaceVersion, err := version.GetSyndesisVersionFromNamespace(syndesis.Namespace)
+	namespaceVersion, err := configuration.GetSyndesisVersionFromNamespace(syndesis.Namespace)
 	if err != nil {
 		return err
 	}
@@ -67,7 +68,7 @@ func (a *Upgrade) Execute(syndesis *v1alpha1.Syndesis) error {
 			logrus.Info("Upgrading syndesis resource ", syndesis.Name, " from version ", namespaceVersion, " to ", targetVersion)
 
 			for _, res := range resources {
-				setNamespaceAndOwnerReference(res, syndesis)
+				operation.SetNamespaceAndOwnerReference(res, syndesis)
 
 				err = createOrReplaceForce(res, true)
 				if err != nil {
@@ -92,7 +93,7 @@ func (a *Upgrade) Execute(syndesis *v1alpha1.Syndesis) error {
 		} else {
 			// No upgrade pod, no version change: upgraded
 			logrus.Info("Syndesis resource ", syndesis.Name, " already upgraded to version ", targetVersion)
-			return upgradeCompleted(syndesis, targetVersion)
+			return completeUpgrade(syndesis, targetVersion)
 		}
 	} else {
 		// Upgrade pod present, checking the status
@@ -100,14 +101,14 @@ func (a *Upgrade) Execute(syndesis *v1alpha1.Syndesis) error {
 			// Upgrade finished (correctly)
 
 			// Getting the namespace version again for double check
-			newNamespaceVersion, err := version.GetSyndesisVersionFromNamespace(syndesis.Namespace)
+			newNamespaceVersion, err := configuration.GetSyndesisVersionFromNamespace(syndesis.Namespace)
 			if err != nil {
 				return err
 			}
 
 			if newNamespaceVersion == targetVersion {
 				logrus.Info("Syndesis resource ", syndesis.Name, " upgraded to version ", targetVersion)
-				return upgradeCompleted(syndesis, targetVersion)
+				return completeUpgrade(syndesis, targetVersion)
 			} else {
 				logrus.Warn("Upgrade pod terminated successfully but Syndesis version (", newNamespaceVersion, ") does not reflect target version (", targetVersion, ") for resource ", syndesis.Name, ". Forcing upgrade.")
 
@@ -128,7 +129,7 @@ func (a *Upgrade) Execute(syndesis *v1alpha1.Syndesis) error {
 			logrus.Warn("Failure while upgrading Syndesis resource ", syndesis.Name, " to version ", targetVersion, ": upgrade pod failure")
 
 			target := syndesis.DeepCopy()
-			target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusUpgradeFailureBackoff
+			target.Status.Phase = v1alpha1.SyndesisPhaseUpgradeFailureBackoff
 			target.Status.Reason = v1alpha1.SyndesisStatusReasonUpgradePodFailed
 			target.Status.Description = "Syndesis upgrade from " + namespaceVersion + " to " + targetVersion + " failed (it will be retried again)"
 			target.Status.LastUpgradeFailure = &metav1.Time{
@@ -147,9 +148,14 @@ func (a *Upgrade) Execute(syndesis *v1alpha1.Syndesis) error {
 
 }
 
-func upgradeCompleted(syndesis *v1alpha1.Syndesis, newVersion string) error {
+func completeUpgrade(syndesis *v1alpha1.Syndesis, newVersion string) error {
+	// After upgrade, pods may be detached
+	if err := operation.AttachSyndesisToResource(syndesis); err != nil {
+		return err
+	}
+
 	target := syndesis.DeepCopy()
-	target.Status.InstallationStatus = v1alpha1.SyndesisInstallationStatusInstalled
+	target.Status.Phase = v1alpha1.SyndesisPhaseInstalled
 	target.Status.TargetVersion = ""
 	target.Status.Reason = v1alpha1.SyndesisStatusReasonMissing
 	target.Status.Description = ""
