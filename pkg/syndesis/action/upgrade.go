@@ -5,7 +5,7 @@ import (
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
 	"github.com/syndesisio/syndesis-operator/pkg/apis/syndesis/v1alpha1"
-	"github.com/syndesisio/syndesis-operator/pkg/syndesis/common"
+	"github.com/syndesisio/syndesis-operator/pkg/syndesis/operation"
 	syndesistemplate "github.com/syndesisio/syndesis-operator/pkg/syndesis/template"
 	"github.com/syndesisio/syndesis-operator/pkg/syndesis/configuration"
 	"github.com/syndesisio/syndesis-operator/pkg/util"
@@ -68,7 +68,7 @@ func (a *Upgrade) Execute(syndesis *v1alpha1.Syndesis) error {
 			logrus.Info("Upgrading syndesis resource ", syndesis.Name, " from version ", namespaceVersion, " to ", targetVersion)
 
 			for _, res := range resources {
-				common.SetNamespaceAndOwnerReference(res, syndesis)
+				operation.SetNamespaceAndOwnerReference(res, syndesis)
 
 				err = createOrReplaceForce(res, true)
 				if err != nil {
@@ -150,7 +150,7 @@ func (a *Upgrade) Execute(syndesis *v1alpha1.Syndesis) error {
 
 func completeUpgrade(syndesis *v1alpha1.Syndesis, newVersion string) error {
 	// After upgrade, pods may be detached
-	if err := common.AttachSyndesisToResource(syndesis); err != nil {
+	if err := operation.AttachSyndesisToResource(syndesis); err != nil {
 		return err
 	}
 

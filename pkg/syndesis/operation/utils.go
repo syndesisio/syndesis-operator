@@ -1,4 +1,4 @@
-package common
+package operation
 
 import (
 	"github.com/syndesisio/syndesis-operator/pkg/apis/syndesis/v1alpha1"

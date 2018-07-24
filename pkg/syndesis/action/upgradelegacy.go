@@ -5,7 +5,7 @@ import (
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
 	"github.com/syndesisio/syndesis-operator/pkg/apis/syndesis/v1alpha1"
-	"github.com/syndesisio/syndesis-operator/pkg/syndesis/common"
+	"github.com/syndesisio/syndesis-operator/pkg/syndesis/operation"
 	"github.com/syndesisio/syndesis-operator/pkg/syndesis/configuration"
 )
 
@@ -27,7 +27,7 @@ func (a *UpgradeLegacy) Execute(syndesis *v1alpha1.Syndesis) error {
 
 	logrus.Info("Attaching Syndesis installation to resource ", syndesis.Name)
 
-	err := common.AttachSyndesisToResource(syndesis)
+	err := operation.AttachSyndesisToResource(syndesis)
 	if err != nil {
 		return err
 	}

@@ -69,7 +69,7 @@ const (
 )
 
 type SyndesisStatus struct {
-	Phase				SyndesisPhase				`json:"installationStatus,omitempty"`
+	Phase				SyndesisPhase				`json:"phase,omitempty"`
 	UpgradeAttempts		int32						`json:"upgradeAttempts,omitempty"`
 	LastUpgradeFailure	*metav1.Time				`json:"lastUpgradeFailure,omitempty"`
 	ForceUpgrade		bool						`json:"forceUpgrade,omitempty"`
