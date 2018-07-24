@@ -57,7 +57,7 @@ func isAnotherActiveInstallationPresent(syndesis *v1alpha1.Syndesis) (bool, erro
 	for _, that := range lst.Items {
 		if that.Name != syndesis.Name &&
 			that.Status.Phase != v1alpha1.SyndesisPhaseNotInstalled &&
-			that.Status.Phase != v1alpha1.SyndesisStatusReasonMissing {
+			that.Status.Phase != v1alpha1.SyndesisPhaseMissing {
 				return true, nil
 		}
 	}

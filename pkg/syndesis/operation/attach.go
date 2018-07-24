@@ -52,6 +52,8 @@ func getAllManagerSelectors() []metav1.ListOptions {
 		{
 			LabelSelector: "app=syndesis,syndesis.io/app=todo",
 		},
+		// In the 7.0 template, the database does not have syndesis.io/type=infrastructure label
+		// It can be removed when it's no longer necessary to upgrade from 7.0 (together with the "legacy" package)
 		{
 			LabelSelector: "syndesis.io/app=syndesis,syndesis.io/component=syndesis-db",
 		},
