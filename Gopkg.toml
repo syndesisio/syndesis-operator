@@ -13,8 +13,6 @@
 
 [[constraint]]
   name = "github.com/operator-framework/operator-sdk"
-  source = "git@github.com:nicolaferraro/operator-sdk.git"
-  # Using a fork until changes are merged back
-  branch = "syndesis-changes"
+  branch = "master"
   # version = "=v0.0.5"
 
