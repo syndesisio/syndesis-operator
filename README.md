@@ -1,3 +1,6 @@
+### This repo has been move to [syndesis](https://github.com/syndesisio/syndesis) monor repo in the sub directory [install/operator](https://github.com/syndesisio/syndesis/tree/master/install/operator).
+
+------------------
 # Syndesis Infrastructure Operator
 
 An operator for installing and updating [Syndesis](https://github.com/syndesisio/syndesis).
